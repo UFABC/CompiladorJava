@@ -1,14 +1,22 @@
 // $ANTLR 2.7.6 (2005-12-22): gramatica.g -> JujuParserTokenTypes.txt$
 JujuParser    // output token vocab name
 LITERAL_function="function"=4
-LITERAL_end="end"=5
-LITERAL_reserva="reserva"=6
-T_id=7
+T_id=5
+LITERAL_end="end"=6
+T_tipo=7
 T_vir=8
 T_pv=9
-LITERAL_input="input"=10
-T_ap=11
-T_fp=12
-LITERAL_output="output"=13
-T_msg=14
-T_ws=15
+LITERAL_if="if"=10
+LITERAL_then="then"=11
+LITERAL_else="else"=12
+LITERAL_begin="begin"=13
+LITERAL_colocarumbagulhodemaiorigualprapodervalidaraexpressao="colocarumbagulhodemaiorigualprapodervalidaraexpressao"=14
+T_op_logico=15
+LITERAL_fimdacomparacao="fimdacomparacao"=16
+LITERAL_matematica="matematica"=17
+LITERAL_input="input"=18
+T_ap=19
+T_fp=20
+LITERAL_output="output"=21
+T_msg=22
+T_ws=23

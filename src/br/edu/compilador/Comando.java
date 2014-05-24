@@ -8,8 +8,6 @@ package br.edu.compilador;
  *
  * @author francisco.massetto
  */
-public abstract class Comando {
+public abstract class Comando extends Symbol {
     public abstract void run();
-    
-    
 }

@@ -2,8 +2,7 @@ class JujuParser extends Parser;
 {
     private RTSymbolTable st;
 
-    //TODO Tem que mudar esse RTVAR pra Variable, que é uma classe estendida (tirar os comentarios ao executar)
-	private RTVar var;
+	private Variable var;
 	private Program prog;
 
 	public String convertedProgram;
@@ -23,8 +22,7 @@ programStart: function
 
 function	:  "function" T_id  (comando)+ "end"
 				{
-					//TODO Possivelmente será necessário uma classe function, ou uma classe class que eu adiciono function?
-					st.add(new RTVar(LT(0).getText(),0,false));
+					st.add(new Function(LT(0).getText()));
 				}
 			;
 
@@ -36,16 +34,25 @@ comando   	: cmdLeitura
 	
 declara		: T_tipo T_id 
                    {
-				         st.add(new RTVar(LT(0).getText(),0,false));
+                   		if (LT(0).getText() == "Int") {
+                   			st.add(new IntegerVariable(LT(1).getText()));
+                   		} else if (LT(0).getText() == "String") {
+                   			st.add(new StringVariable(LT(1).getText()));                   			
+                   		}
+				        
 				   }
                    (T_vir T_id
 				        {
-				            if(st.getByName(LT(0).getText()) != null){
+				            if(st.exists(LT(0).getText(), Variable.class)){
 							   throw new RecognitionException("Variavel ja declarada");					  
 							}
-							else{
-							   st.add(new RTVar(LT(0).getText(),0,false));
-							}
+							else {
+		                   		if (LT(0).getText() == "Int") {
+		                   			st.add(new IntegerVariable(LT(1).getText()));
+		                   		} else if (LT(0).getText() == "String") {
+		                   			st.add(new StringVariable(LT(1).getText()));                   			
+		                   		}
+		                   	}
 						}
 				   )* T_pv
 				;
@@ -61,8 +68,7 @@ op_aritmetica   : "matematica"
 				
 cmdLeitura :  "input" T_ap T_id
                     {
-					       var = st.getByName(LT(0).getText());
-					       if (var == null){
+					       if (!st.exists(LT(0).getText(), Variable.class)){
 						       System.err.println("Variavel nao declarada");
 						   }
 					}
@@ -76,11 +82,10 @@ cmdLeitura :  "input" T_ap T_id
 cmdEscrita :  "output" T_ap (T_id 
 										{
 										   // verificar se foi declarado
-										   var = st.getByName(LT(0).getText());
-										   if (var == null)
-										      System.err.println("Nao declarado");
-										   else
-										      prog.addComando(new ComandoEscrita(var));
+											if (!st.exists(LT(0).getText(), Variable.class)){
+						       					System.err.println("Variavel nao declarada");
+						   					} else
+										    	prog.addComando(new ComandoEscrita(var));
 										   
 										}
                                        | 

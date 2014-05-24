@@ -1,13 +1,16 @@
 package br.edu.compilador;
 
-public abstract class Variable {
-	public String name;
-	public char[] value;
+public abstract class Variable<Type> extends Symbol {
+	public Type value;
 	
-	public abstract void SetValue(char[] value);
-	
-	public void SetName(String name)
-	{
+	public Variable(String name, Type value) {
 		this.name = name;
+		this.value = value;
 	}
+	
+	public void setValue(Type value)
+	{
+		this.value = value;
+	}
+	
 }

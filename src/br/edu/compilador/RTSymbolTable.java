@@ -12,23 +12,25 @@ import java.util.ArrayList;
  * @author francisco.massetto
  */
 public class RTSymbolTable {
-    ArrayList<RTVar> symbols;
+    ArrayList<Symbol> symbols;
     
     public RTSymbolTable(){
-        symbols = new ArrayList<RTVar>();
+        symbols = new ArrayList<Symbol>();
     }
     
-    public void add(RTVar elemento){
-        symbols.add(elemento);
+    public void add(Symbol element){
+        symbols.add(element);
     }
     
-    public RTVar getByName(String varName){
-        for(RTVar item: symbols){
-            if (item.getNome().equals(varName)){
-                return item;
-            }
+    public boolean exists(String varName, Class<?> symbolType){
+        for(Symbol item: symbols){
+        	if(symbolType.isInstance(item)){        		
+        		if (item.getName().equals(varName)){
+        			return true;
+        		}
+        	}
         }
-        return null;
+        return false;
     }
     
 }

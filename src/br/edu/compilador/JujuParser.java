@@ -20,7 +20,7 @@ public class JujuParser extends antlr.LLkParser       implements JujuParserToken
 
     private RTSymbolTable st;
 
-	private RTVar var;
+	private Variable var;
 	private Program prog;
 
 	public String convertedProgram;
@@ -91,7 +91,7 @@ public JujuParser(ParserSharedInputState state) {
 			}
 			match(LITERAL_end);
 			
-								st.add(new RTVar(LT(0).getText(),0,false));
+								st.add(new Function(LT(0).getText()));
 							
 		}
 		catch (RecognitionException ex) {
@@ -145,8 +145,7 @@ public JujuParser(ParserSharedInputState state) {
 			match(T_ap);
 			match(T_id);
 			
-								       var = st.getByName(LT(0).getText());
-								       if (var == null){
+								       if (!st.exists(LT(0).getText(), Variable.class)){
 									       System.err.println("Variavel nao declarada");
 									   }
 								
@@ -175,11 +174,10 @@ public JujuParser(ParserSharedInputState state) {
 				match(T_id);
 				
 														   // verificar se foi declarado
-														   var = st.getByName(LT(0).getText());
-														   if (var == null)
-														      System.err.println("Nao declarado");
-														   else
-														      prog.addComando(new ComandoEscrita(var));
+															if (!st.exists(LT(0).getText(), Variable.class)){
+										       					System.err.println("Variavel nao declarada");
+										   					} else
+														    	prog.addComando(new ComandoEscrita(var));
 														   
 														
 				break;
@@ -214,7 +212,12 @@ public JujuParser(ParserSharedInputState state) {
 			match(T_tipo);
 			match(T_id);
 			
-							         st.add(new RTVar(LT(0).getText(),0,false));
+					if (LT(0).getText() == "Int") {
+						st.add(new IntegerVariable(LT(1).getText()));
+					} else if (LT(0).getText() == "String") {
+						st.add(new StringVariable(LT(1).getText()));                   			
+					}
+							        
 							
 			{
 			_loop8:
@@ -223,12 +226,16 @@ public JujuParser(ParserSharedInputState state) {
 					match(T_vir);
 					match(T_id);
 					
-									            if(st.getByName(LT(0).getText()) != null){
+									            if(st.exists(LT(0).getText(), Variable.class)){
 												   throw new RecognitionException("Variavel ja declarada");					  
 												}
-												else{
-												   st.add(new RTVar(LT(0).getText(),0,false));
-												}
+												else {
+							                   		if (LT(0).getText() == "Int") {
+							                   			st.add(new IntegerVariable(LT(1).getText()));
+							                   		} else if (LT(0).getText() == "String") {
+							                   			st.add(new StringVariable(LT(1).getText()));                   			
+							                   		}
+							                   	}
 											
 				}
 				else {

@@ -31,4 +31,10 @@ public class ComandoEscrita extends Comando {
         }
 
     }
+
+	@Override
+	public String toC() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

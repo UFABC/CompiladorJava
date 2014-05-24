@@ -10,9 +10,9 @@ package br.edu.compilador;
  * @author francisco.massetto
  */
 public class ComandoLeitura extends Comando{
-    private RTVar var;
+    private Variable var;
 
-    public ComandoLeitura(RTVar var) {
+    public ComandoLeitura(Variable var) {
         this.var = var;
     }
     
@@ -22,23 +22,32 @@ public class ComandoLeitura extends Comando{
     
     public void run(){
         String txt;
-        txt = javax.swing.JOptionPane.showInputDialog(" Digite o valor de "+var.getNome());
-        var.setValor(Integer.parseInt(txt));
+        txt = javax.swing.JOptionPane.showInputDialog(" Digite o valor de " + var.getName());
+        if (var instanceof IntegerVariable)
+        	((IntegerVariable) var).setValue(Integer.parseInt(txt));
+        if (var instanceof StringVariable)
+        	((StringVariable) var).setValue(txt);
     }
 
     /**
      * @return the var
      */
-    public RTVar getVar() {
+    public Variable getVar() {
         return var;
     }
 
     /**
      * @param var the var to set
      */
-    public void setVar(RTVar var) {
+    public void setVar(Variable var) {
         this.var = var;
     }
+
+	@Override
+	public String toC() {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
     
 }
