@@ -1,3 +1,4 @@
+package br.edu.compilador;
 
 import java.util.ArrayList;
 
@@ -8,12 +9,12 @@ import java.util.ArrayList;
 
 /**
  *
- * @author francisco.massetto
+ * @author Juju
  */
-public class Programa {
+public class Program {
     private ArrayList<Comando> comandos;
     
-    public Programa(){
+    public Program(){
         comandos = new ArrayList<Comando>();
     }
     
@@ -21,6 +22,11 @@ public class Programa {
         for(Comando c: comandos){
             c.run();
         }
+    }
+    
+    public String convert()
+    {
+    	return "ConvertedCode;";
     }
     
     public void addComando(Comando c){

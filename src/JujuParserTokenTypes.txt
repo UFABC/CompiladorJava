@@ -1,7 +1,7 @@
 // $ANTLR 2.7.6 (2005-12-22): gramatica.g -> JujuParserTokenTypes.txt$
 JujuParser    // output token vocab name
-INICIO=4
-FIM=5
+LITERAL_function="function"=4
+LITERAL_end="end"=5
 LITERAL_reserva="reserva"=6
 T_id=7
 T_vir=8

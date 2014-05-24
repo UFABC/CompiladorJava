@@ -1,3 +1,4 @@
+package br.edu.compilador;
 
 import java.util.ArrayList;
 
@@ -11,18 +12,18 @@ import java.util.ArrayList;
  * @author francisco.massetto
  */
 public class RTSymbolTable {
-    ArrayList<RTVar> listaVariaveis;
+    ArrayList<RTVar> symbols;
     
     public RTSymbolTable(){
-        listaVariaveis = new ArrayList<RTVar>();
+        symbols = new ArrayList<RTVar>();
     }
     
     public void add(RTVar elemento){
-        listaVariaveis.add(elemento);
+        symbols.add(elemento);
     }
     
     public RTVar getByName(String varName){
-        for(RTVar item: listaVariaveis){
+        for(RTVar item: symbols){
             if (item.getNome().equals(varName)){
                 return item;
             }

@@ -1,9 +1,12 @@
+package br.edu.compilador;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 
 /*
@@ -47,13 +50,14 @@ public class MainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Chiller", 0, 48)); // NOI18N
-        jLabel1.setText("IsiDE \\m/");
+        jLabel1.setText("IDE");
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgSave.png"))); // NOI18N
+        
+        ImageIcon ii = new ImageIcon(this.getClass().getResource("/resources/imgSave.png"));
+        jButton1.setIcon(ii); // NOI18N
         jButton1.setText("Open");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -61,7 +65,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgPlay.png"))); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/imgPlay.png"))); // NOI18N
         jButton2.setText("Play");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -117,7 +121,7 @@ public class MainFrame extends javax.swing.JFrame {
         JujuLexer  lexer = new JujuLexer(new FileInputStream(new File(strNomeArquivo)));
         JujuParser parser = new JujuParser(lexer);
         parser.init();
-        parser.programa();
+        parser.programStart();
        }
        catch(Exception e){
            jTextArea2.setText(e.getMessage());

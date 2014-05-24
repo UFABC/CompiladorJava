@@ -1,20 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
+package br.edu.compilador;
 /**
  *
  * @author francisco.massetto
+ * 
  */
 public class RTVar {
     private String  nome;
     private int     valor;
     private boolean initialized;
-
-    public RTVar() {
-        /*do nothing */
-    }
     
     public RTVar(String nome, int valor, boolean initialized) {
         this.nome = nome;
