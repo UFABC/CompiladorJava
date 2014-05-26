@@ -11,6 +11,30 @@ class JujuParser extends Parser;
 	    st = new RTSymbolTable();	 
 		prog = new Program();
 	}
+
+	private void atrib(Variable<?> actualVar)
+	{
+		if (actualVar == null) {
+			throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
+		} else {
+			int actualType = LT(0).getType();
+			String actualValue = LT(0).getText();
+			if (actualType == T_msg) {
+				if (actualVar instanceof StringVariable){
+					((StringVariable) actualVar).setValue(actualValue);										
+				}
+				else
+					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
+			} else if (actualType == T_num) {
+				if (actualVar instanceof IntegerVariable)
+				{
+					((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));																				
+				} else {
+					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem numero nos texto");										
+				}
+			}
+		}	
+	}
 	 
 }
 
@@ -40,7 +64,7 @@ declara		: T_tipo
 			}
 			T_id
                    {
-                   		if (tipo.equals("Int") {
+                   		if (tipo.equals("Int")) {
                    			st.add(new IntegerVariable(LT(0).getText()));
                    		} else if (tipo.equals("String")) {
                    			st.add(new StringVariable(LT(0).getText()));                   			
@@ -56,18 +80,7 @@ atrib		: T_id
 			}
 			T_atrib value
 			{
-				if (actualVar == null) {
-					throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
-				} else {
-					int actualType = LT(0).getType();
-					String actualValue = LT(0).getText();
-					if (actualType == T_msg) {
-						if ((StringVariable) actualVar != null)
-							actualType.setValue(LT(0).getText());
-						else
-							throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
-					}
-				}
+				atrib(actualVar);
 			}
 			T_pv
 			;
@@ -148,7 +161,7 @@ T_msg			: '\"' ( ('a'..'z')
 				   '\"'
 				;
 
-T_num			:('0'..'9')+ | (('0'..'9')+'.'('0'..'9')+)
+T_num			:('0'..'9')+ | ('0'..'9')+ '.' ('0'..'9')+
 				;
 
 T_ws        	: ('\n' | '\r' | '\t' | ' ') { $setType(Token.SKIP); }

@@ -101,9 +101,8 @@ public JujuParser(ParserSharedInputState state) {
 							String tipo = LT(0).getText();
 						
 			match(T_id);
-					System.out.println("nova variavel: " + LT(0).getText() + " do tip: " + tipo);
+			
 					if (tipo.equals("Int")) {
-						System.out.println("tipo add");
 						st.add(new IntegerVariable(LT(0).getText()));
 					} else if (tipo.equals("String")) {
 						st.add(new StringVariable(LT(0).getText()));                   			
@@ -285,24 +284,29 @@ public JujuParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(T_id);
 			
-			Symbol symbol = st.getSymbol("pizza", Variable.class);
-			System.out.println("Variavel: "  + LT(0).getText()+ symbol);
 							Variable actualVar = (Variable) st.getSymbol(LT(0).getText(), Variable.class);
 						
 			match(T_atrib);
 			value();
-							
+			
 							if (actualVar == null) {
 								throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
 							} else {
 								int actualType = LT(0).getType();
 								String actualValue = LT(0).getText();
 								if (actualType == T_msg) {
-									if ((StringVariable) actualVar != null){
-										((StringVariable) actualVar).setValue(LT(0).getText());										
+									if (actualVar instanceof StringVariable){
+										((StringVariable) actualVar).setValue(actualValue);										
 									}
 									else
 										throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
+								} else if (actualType == T_num) {
+									if (actualVar instanceof IntegerVariable)
+									{
+										((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));																				
+									} else {
+										throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem numero nos texto");										
+									}
 								}
 							}
 						

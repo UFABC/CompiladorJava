@@ -1,10 +1,10 @@
 function testando
 	Int pizza;
 	
-	pizza = "adoifj";
+	pizza = 32.5;
 	
 	String testeatrib;
 	
-	testeatrib = 34;
+	testeatrib = "f";
 	
 end
