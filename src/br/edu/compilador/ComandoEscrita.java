@@ -22,9 +22,9 @@ public class ComandoEscrita extends Comando {
 
     @Override
     public void run() {
-        if (elemento instanceof RTVar) {
-            RTVar var = (RTVar)elemento;
-            javax.swing.JOptionPane.showMessageDialog(null,var.getNome() + "="+var.getValor());
+        if (elemento instanceof Variable) {
+            Variable<?> var = (Variable<?>)elemento;
+            javax.swing.JOptionPane.showMessageDialog(null,var.getName() + "=" + var.getValue());
         } else if (elemento instanceof java.lang.String) {
             String s = (String)elemento;
             javax.swing.JOptionPane.showMessageDialog(null, s);

@@ -1,4 +1,3 @@
-package br.edu.compilador;
 // $ANTLR 2.7.6 (2005-12-22): "gramatica.g" -> "JujuLexer.java"$
 
 import java.io.InputStream;

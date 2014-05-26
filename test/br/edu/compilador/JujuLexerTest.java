@@ -38,15 +38,11 @@ public class JujuLexerTest {
 	}
 	
 	@Test
-	public void test1SimpleFile() {
+	public void test1SimpleFile() throws RecognitionException, TokenStreamException {
 		setup("teste1");
 		parser.init();
-		try {
-			parser.programStart();
-		} catch (Exception e) {
-			fail();
-			e.printStackTrace();
-		}
+		parser.programStart();
+		
 		
 		assertEquals("ConvertedCode;", parser.convertedProgram);
 	}

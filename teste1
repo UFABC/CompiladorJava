@@ -1,3 +1,10 @@
-inicio
-
-fim
+function testando
+	Int pizza;
+	
+	pizza = "adoifj";
+	
+	String testeatrib;
+	
+	testeatrib = 34;
+	
+end

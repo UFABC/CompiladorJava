@@ -14,48 +14,66 @@ class JujuParser extends Parser;
 	 
 }
 
-programStart: function
+programStart: (declara)* (function)*
 				{
 					convertedProgram = prog.convert();
 				}
 			;
 
-function	:  "function" T_id  (comando)+ "end"
+function	:  "function" T_id  
 				{
 					st.add(new Function(LT(0).getText()));
 				}
+				(comando)+ "end"
 			;
 
 comando   	: cmdLeitura 
 			| cmdEscrita
 			| declara
 			| comandoIfElse
+			| atrib
 			;
 	
-declara		: T_tipo T_id 
+declara		: T_tipo 
+			{
+				String tipo = LT(0).getText();
+			}
+			T_id
                    {
-                   		if (LT(0).getText() == "Int") {
-                   			st.add(new IntegerVariable(LT(1).getText()));
-                   		} else if (LT(0).getText() == "String") {
-                   			st.add(new StringVariable(LT(1).getText()));                   			
+                   		if (tipo.equals("Int") {
+                   			st.add(new IntegerVariable(LT(0).getText()));
+                   		} else if (tipo.equals("String")) {
+                   			st.add(new StringVariable(LT(0).getText()));                   			
                    		}
 				        
 				   }
-                   (T_vir T_id
-				        {
-				            if(st.exists(LT(0).getText(), Variable.class)){
-							   throw new RecognitionException("Variavel ja declarada");					  
-							}
-							else {
-		                   		if (LT(0).getText() == "Int") {
-		                   			st.add(new IntegerVariable(LT(1).getText()));
-		                   		} else if (LT(0).getText() == "String") {
-		                   			st.add(new StringVariable(LT(1).getText()));                   			
-		                   		}
-		                   	}
-						}
-				   )* T_pv
+				   T_pv
 				;
+
+atrib		: T_id 
+			{
+				Variable actualVar = (Variable) st.getSymbol(LT(0).getText(), Variable.class);
+			}
+			T_atrib value
+			{
+				if (actualVar == null) {
+					throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
+				} else {
+					int actualType = LT(0).getType();
+					String actualValue = LT(0).getText();
+					if (actualType == T_msg) {
+						if ((StringVariable) actualVar != null)
+							actualType.setValue(LT(0).getText());
+						else
+							throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
+					}
+				}
+			}
+			T_pv
+			;
+
+value		: T_msg | T_num
+			;
 
 comandoIfElse	: "if" expr "then" comando "end" "else" "begin" comando "end"
 				;
@@ -81,11 +99,11 @@ cmdLeitura :  "input" T_ap T_id
 				
 cmdEscrita :  "output" T_ap (T_id 
 										{
-										   // verificar se foi declarado
-											if (!st.exists(LT(0).getText(), Variable.class)){
-						       					System.err.println("Variavel nao declarada");
-						   					} else
-										    	prog.addComando(new ComandoEscrita(var));
+										   	var = (Variable) st.getSymbol(LT(0).getText(), Variable.class);
+											if (var == null) {
+												throw new RecognitionException("Variavel nao declarada");
+											} else
+										 	prog.addComando(new ComandoEscrita(var));
 										   
 										}
                                        | 
@@ -116,6 +134,9 @@ T_ap			: '('
 T_fp			: ')'
 				;
 
+T_atrib			: '='
+				;
+
 T_op_logico		: '<' | '>' | "<=" | ">=" | "==" | "!="
 				;
 	
@@ -126,6 +147,9 @@ T_msg			: '\"' ( ('a'..'z')
 					   )* 
 				   '\"'
 				;
-				
+
+T_num			:('0'..'9')+ | (('0'..'9')+'.'('0'..'9')+)
+				;
+
 T_ws        	: ('\n' | '\r' | '\t' | ' ') { $setType(Token.SKIP); }
 				;

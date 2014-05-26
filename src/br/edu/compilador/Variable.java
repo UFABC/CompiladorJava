@@ -12,5 +12,9 @@ public abstract class Variable<Type> extends Symbol {
 	{
 		this.value = value;
 	}
+
+	public Type getValue() {
+		return value;
+	}
 	
 }

@@ -19,18 +19,32 @@ public class RTSymbolTable {
     }
     
     public void add(Symbol element){
+    	System.out.println("Add element: " + element.getName());
+        symbols.add(element);
+    }
+    
+    public void add(Variable<?> element){
+    	System.out.println("Add element: " + element.getName());
         symbols.add(element);
     }
     
     public boolean exists(String varName, Class<?> symbolType){
-        for(Symbol item: symbols){
-        	if(symbolType.isInstance(item)){        		
-        		if (item.getName().equals(varName)){
-        			return true;
-        		}
-        	}
-        }
-        return false;
+    	Symbol symbol = getSymbol(varName, symbolType);
+    	if(symbol == null)
+    		return false;
+    	else
+    		return true;
+    }
+    
+    public Symbol getSymbol(String varName, Class<?> symbolType){
+    	for(Symbol item: symbols){
+    		if(symbolType.isInstance(item)){        		
+    			if (item.getName().equals(varName)){
+    				return item;
+    			}
+    		}
+    	}
+    	return null;
     }
     
 }
