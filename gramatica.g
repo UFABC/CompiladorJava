@@ -4,6 +4,8 @@ class JujuParser extends Parser;
 
 	private Variable var;
 	private Program prog;
+	
+	private ComandoIf comando;
 
 	public String convertedProgram;
 	 
@@ -88,12 +90,52 @@ atrib		: T_id
 value		: T_msg | T_num
 			;
 
-comandoIfElse	: "if" expr "then" comando "end" "else" "begin" comando "end"
+comandoIfElse	: 	"if"{ComandoIf cmdif;}
+ 					expr
+ 					"then"{st.add(cmdif);} 								
+					 (comando)+ 
+					 "end" 
+					 "else" 
+					 "begin"{ComandoIf cmdelse;} 
+					 (comando)+ 
+					 "end"
+					| 
+					"if"{ComandoIf cmdif;}
+ 					expr
+ 					"then"{st.add(cmdif);} 								
+					 (comando)+ 
+					 "end" 
 				;
+				
+				
+expr	: termo       { comando.setExprL(LT(0).getText());}
+          ( exprl )* 
 
-expr			: "colocarumbagulhodemaiorigualprapodervalidaraexpressao" T_op_logico "fimdacomparacao"
-				;
+	;
 
+exprl  	: 	T_or  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
+			|
+			T_and { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
+			|
+			T_eq  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
+			|
+			T_neq  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
+			|
+			T_gt  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
+			|
+			T_lt  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
+		;
+
+termo   : T_id 
+         { comando.setExprR(LT(0).getText());}
+		;
+		
 op_aritmetica   : "matematica"
 				;
 				
@@ -159,6 +201,19 @@ T_msg			: '\"' ( ('a'..'z')
 					   | (' ') 
 					   )* 
 				   '\"'
+				;
+				
+T_or			: "||"
+				;
+T_and 			: "&&"
+				;
+T_eq 			: "=="
+				;
+T_neq 			: "!="
+				;
+T_gt 			: ">="
+				;
+T_lt 			: "<="
 				;
 
 T_num			: ('0'..'9')+ '.' ('0'..'9')+ | ('0'..'9')+
