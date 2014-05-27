@@ -3,20 +3,20 @@ package br.edu.compilador;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public abstract class Expression<T> {
-	public ArrayList<T> values;
+public abstract class Expression {
+	public ArrayList<Object> values;
 	public ArrayList<Integer> operators;
 	
 	public Expression() {
-		this.values = new ArrayList<T>();
+		this.values = new ArrayList<Object>();
 		this.operators = new ArrayList<Integer>();
 	}
 	
-	public void add(T value){
+	public void add(Object value){
 		values.add(value);
 	}
 	
-	public void add(T value, Integer operator) {
+	public void add(Object value, Integer operator) {
 		values.add(value);
 		operators.add(operator);
 	}

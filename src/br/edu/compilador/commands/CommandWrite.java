@@ -41,8 +41,8 @@ public class CommandWrite extends Command {
         if (elemento instanceof Variable) {
             Variable<?> var = (Variable<?>)elemento;
             cCode += var.getName();
-        } else if (elemento instanceof Expression<?>) {
-            String s = ((Expression<?>) elemento).toC();
+        } else if (elemento instanceof Expression) {
+            String s = ((Expression) elemento).toC();
             cCode += s;
         }		
         return cCode + ";";

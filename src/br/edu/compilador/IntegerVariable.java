@@ -5,7 +5,6 @@ public class IntegerVariable extends Variable<Integer>{
 	{
 		this(name, 0);
 		this.initialized = false;
-		System.out.println("new integer: " + name);
 	}
 	
 	public IntegerVariable(String name, Integer value) {

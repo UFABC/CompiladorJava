@@ -14,5 +14,7 @@ testeatrib = "f";
 
 cout << "teste";
 
+cout << testeatrib;
+
 return 0;
 }

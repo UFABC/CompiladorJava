@@ -2,6 +2,6 @@ function testando4
 	Int pizza;
 	while pizza < 5 then
 		output(pizza);
-		pizza = 5;
+		pizza = pizza + 1;
 	end
 end

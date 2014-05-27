@@ -24,7 +24,7 @@ public class JujuParser extends antlr.LLkParser       implements JujuParserToken
 	
 	private Variable<?> actualVar;
 
-	private Expression<?> actualExpression;
+	private Expression actualExpression;
 
 	private LogicExpression actualLogic;
 
@@ -281,36 +281,10 @@ public JujuParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(LITERAL_output);
 			match(T_ap);
-			{
-			switch ( LA(1)) {
-			case T_id:
-			{
-				match(T_id);
-				
-														   	Variable var = prog.getVariable(LT(0).getText());
-															if (var == null) {
-																throw new RecognitionException("Variavel nao declarada");
-															} else
-														 	prog.addCommand(new CommandWrite(var));
-														   
-														
-				break;
-			}
-			case T_num:
-			case T_msg:
-			{
-				value();
-				
-													       prog.addCommand(new CommandWrite(actualExpression));
-													
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-			}
+			value();
+			
+												       prog.addCommand(new CommandWrite(actualExpression));
+												
 			match(T_fp);
 			match(T_pv);
 		}
@@ -447,6 +421,26 @@ public JujuParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			switch ( LA(1)) {
+			case T_id:
+			{
+				match(T_id);
+				
+								 	Variable<?> var = (Variable<?>) prog.getVariable(LT(0).getText());
+									if (var == null)
+										throw new RecognitionException("Essa variavel ae nao existe nao");
+									else {
+										if (var instanceof IntegerVariable) {
+								 			actualExpression = new MathExpression((IntegerVariable) var);
+								 			op_math_end();
+								 		}
+								 		else {
+								 			actualExpression = new StringExpression((StringVariable) var);
+								 			op_text_end();
+								 		}
+									}
+								
+				break;
+			}
 			case T_num:
 			{
 				op_math();
@@ -476,52 +470,7 @@ public JujuParser(ParserSharedInputState state) {
 			{
 			match(T_num);
 			actualExpression = new MathExpression(toInt(LT(0).getText()));
-			{
-			_loop32:
-			do {
-				if (((LA(1) >= T_plus && LA(1) <= T_div))) {
-					int type = 0;
-					{
-					switch ( LA(1)) {
-					case T_plus:
-					{
-						match(T_plus);
-						type = LT(0).getType();
-						break;
-					}
-					case T_minus:
-					{
-						match(T_minus);
-						type = LT(0).getType();
-						break;
-					}
-					case T_times:
-					{
-						match(T_times);
-						type = LT(0).getType();
-						break;
-					}
-					case T_div:
-					{
-						match(T_div);
-						type = LT(0).getType();
-						break;
-					}
-					default:
-					{
-						throw new NoViableAltException(LT(1), getFilename());
-					}
-					}
-					}
-					match(T_num);
-					((MathExpression) actualExpression).add(toInt(LT(0).getText()), type);
-				}
-				else {
-					break _loop32;
-				}
-				
-			} while (true);
-			}
+			op_math_end();
 			}
 		}
 		catch (RecognitionException ex) {
@@ -537,22 +486,7 @@ public JujuParser(ParserSharedInputState state) {
 			{
 			match(T_msg);
 			actualExpression = new StringExpression(LT(0).getText());
-			{
-			_loop36:
-			do {
-				if ((LA(1)==T_plus)) {
-					int type = 0;
-					match(T_plus);
-					type = LT(0).getType();
-					match(T_msg);
-					((StringExpression) actualExpression).add(LT(0).getText(), type);
-				}
-				else {
-					break _loop36;
-				}
-				
-			} while (true);
-			}
+			op_text_end();
 			}
 		}
 		catch (RecognitionException ex) {
@@ -693,6 +627,123 @@ public JujuParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_8);
+		}
+	}
+	
+	public final void op_math_end() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			{
+			_loop34:
+			do {
+				if (((LA(1) >= T_plus && LA(1) <= T_div))) {
+					int type = 0;
+					{
+					switch ( LA(1)) {
+					case T_plus:
+					{
+						match(T_plus);
+						type = LT(0).getType();
+						break;
+					}
+					case T_minus:
+					{
+						match(T_minus);
+						type = LT(0).getType();
+						break;
+					}
+					case T_times:
+					{
+						match(T_times);
+						type = LT(0).getType();
+						break;
+					}
+					case T_div:
+					{
+						match(T_div);
+						type = LT(0).getType();
+						break;
+					}
+					default:
+					{
+						throw new NoViableAltException(LT(1), getFilename());
+					}
+					}
+					}
+					{
+					switch ( LA(1)) {
+					case T_num:
+					{
+						match(T_num);
+						((MathExpression) actualExpression).add(toInt(LT(0).getText()), type);
+						break;
+					}
+					case T_id:
+					{
+						match(T_id);
+						break;
+					}
+					case T_pv:
+					case T_plus:
+					case T_minus:
+					case T_times:
+					case T_div:
+					case T_fp:
+					{
+						
+												 	IntegerVariable intVar = (IntegerVariable) prog.getVariable(LT(0).getText());
+													if (intVar == null)
+														throw new RecognitionException("Vamo la, vc ta somando algo errado ai, vai com calma campeao.");
+													else
+												 		((MathExpression) actualExpression).add(new MathExpression(intVar));
+												
+						break;
+					}
+					default:
+					{
+						throw new NoViableAltException(LT(1), getFilename());
+					}
+					}
+					}
+				}
+				else {
+					break _loop34;
+				}
+				
+			} while (true);
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_5);
+		}
+	}
+	
+	public final void op_text_end() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			{
+			_loop39:
+			do {
+				if ((LA(1)==T_plus)) {
+					int type = 0;
+					match(T_plus);
+					type = LT(0).getType();
+					match(T_msg);
+					((StringExpression) actualExpression).add(LT(0).getText(), type);
+				}
+				else {
+					break _loop39;
+				}
+				
+			} while (true);
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_5);
 		}
 	}
 	

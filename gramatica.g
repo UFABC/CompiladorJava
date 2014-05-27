@@ -8,7 +8,7 @@ class JujuParser extends Parser;
 	
 	private Variable<?> actualVar;
 
-	private Expression<?> actualExpression;
+	private Expression actualExpression;
 
 	private LogicExpression actualLogic;
 
@@ -119,7 +119,23 @@ atrib		: T_id
 			T_pv
 			;
 
-value		: op_math  | op_text
+value		: T_id
+				{
+				 	Variable<?> var = (Variable<?>) prog.getVariable(LT(0).getText());
+					if (var == null)
+						throw new RecognitionException("Essa variavel ae nao existe nao");
+					else {
+						if (var instanceof IntegerVariable) {
+				 			actualExpression = new MathExpression((IntegerVariable) var);
+				 			op_math_end();
+				 		}
+				 		else {
+				 			actualExpression = new StringExpression((StringVariable) var);
+				 			op_text_end();
+				 		}
+					}
+				}
+				| op_math  | op_text
 			;
 
 comandoIfElse	: 	"if" exprif "then" (comando)+ "end" {prog.addCommand(new CommandEnd());}
@@ -180,26 +196,42 @@ operator  	: 	T_or
 		;
 		
 op_math			: 
-					(T_num {actualExpression = new MathExpression(toInt(LT(0).getText()));}
-						( {int type = 0;}
-							(T_plus  {type = LT(0).getType();}
-							|T_minus {type = LT(0).getType();}
-							|T_times {type = LT(0).getType();}
-							|T_div	 {type = LT(0).getType();}
-							)
-							T_num {((MathExpression) actualExpression).add(toInt(LT(0).getText()), type);}
-						)*
+					(
+						T_num {actualExpression = new MathExpression(toInt(LT(0).getText()));}						 
+						op_math_end
 					)
 				;
-
-op_text			: 
-					(T_msg {actualExpression = new StringExpression(LT(0).getText());}
-						( {int type = 0;}
-							T_plus  {type = LT(0).getType();}
-							T_msg {((StringExpression) actualExpression).add(LT(0).getText(), type);}
-						)*
+op_math_end		:
+				( 	{int type = 0;}
+					(T_plus  {type = LT(0).getType();}
+					|T_minus {type = LT(0).getType();}
+					|T_times {type = LT(0).getType();}
+					|T_div	 {type = LT(0).getType();}
 					)
-				;				
+					(T_num {((MathExpression) actualExpression).add(toInt(LT(0).getText()), type);}
+					|T_id |
+						 {
+						 	IntegerVariable intVar = (IntegerVariable) prog.getVariable(LT(0).getText());
+							if (intVar == null)
+								throw new RecognitionException("Vamo la, vc ta somando algo errado ai, vai com calma campeao.");
+							else
+						 		((MathExpression) actualExpression).add(new MathExpression(intVar));
+						 }
+					)
+				)*
+				;
+op_text			: 
+					(
+						T_msg {actualExpression = new StringExpression(LT(0).getText());}
+						op_text_end
+					)
+				;	
+op_text_end		:
+					( {int type = 0;}
+						T_plus  {type = LT(0).getType();}
+						T_msg {((StringExpression) actualExpression).add(LT(0).getText(), type);}
+					)*			
+				;
 cmdLeitura :  "input" T_ap T_id
                     {
                     	Variable var = prog.getVariable(LT(0).getText());
@@ -214,21 +246,12 @@ cmdLeitura :  "input" T_ap T_id
 					}
 				;
 				
-cmdEscrita :  "output" T_ap (T_id 
-										{
-										   	Variable var = prog.getVariable(LT(0).getText());
-											if (var == null) {
-												throw new RecognitionException("Variavel nao declarada");
-											} else
-										 	prog.addCommand(new CommandWrite(var));
-										   
-										}
-                                       | 
+cmdEscrita :  "output" T_ap 
 									   value
 									   {
 									       prog.addCommand(new CommandWrite(actualExpression));
 									   }
-									   ) T_fp T_pv
+									    T_fp T_pv
 				;
 
 class JujuLexer extends Lexer;

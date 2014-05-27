@@ -5,7 +5,7 @@ import br.edu.compilador.*;
 public class CommandAttribution extends Command{
 	Variable<?> variable;
 	
-	Expression<?> attributedValue;
+	Expression attributedValue;
 
 	public CommandAttribution(Variable<?> variable, String newValue) {
 		this.variable = variable;
@@ -22,7 +22,7 @@ public class CommandAttribution extends Command{
 		((IntegerVariable) this.variable).setValue(newValue);
 	}
 	
-	public CommandAttribution(Variable<?> variable, Expression<?> newValue) {
+	public CommandAttribution(Variable<?> variable, Expression newValue) {
 		this.variable = variable;
 		this.attributedValue = newValue;
 	}

@@ -8,4 +8,5 @@ function testando
 	testeatrib = "f";
 	
 	output("teste");
+	output(testeatrib);
 end
