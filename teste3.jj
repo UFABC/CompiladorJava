@@ -1,4 +1,4 @@
-function testando2
+function testando3
 	Int pizza;
 	
 	if pizza == 0 then

@@ -12,4 +12,9 @@ public class StringVariable extends Variable<String> {
 		super(name, value);
 	}
 
+	@Override
+	public Variable<?> copy() {
+		return new StringVariable(this.name, this.value);
+	}
+
 }

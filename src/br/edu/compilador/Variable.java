@@ -24,4 +24,5 @@ public abstract class Variable<Type> implements Symbol {
 		return name;
 	}
 	
+	public abstract Variable<?> copy ();
 }

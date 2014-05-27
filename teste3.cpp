@@ -2,9 +2,9 @@
 #include <string>
 using namespace std;
 
-int testando()
+int testando3()
 {
-int pizza;
+int pizza = 0;
 
 if (pizza == 0) {
 pizza = 43;

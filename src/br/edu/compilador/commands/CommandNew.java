@@ -4,10 +4,11 @@ import br.edu.compilador.*;
 
 public class CommandNew extends Command {
 	private Variable<?> variable;
-	
+	private Object initialValue;
 	
 	public CommandNew(Variable<?> variable) {
 		this.variable = variable;
+		this.initialValue = variable.value;
 	}
 
 	public Variable<?> getVariable() {
@@ -30,8 +31,9 @@ public class CommandNew extends Command {
 		}
 		cNew += variable.name;
 		
-		if (variable.initialized) {
-			cNew += " " + variable.value;
+		cNew += " = " + initialValue.toString();
+		if (initialValue.toString().isEmpty()) {
+			cNew += "\"\"";
 		}
 		
 		return cNew + ";";

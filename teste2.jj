@@ -1,7 +1,7 @@
 function testando2
 	Int pizza;
 	
-	pizza = 32.5 + 32;
+	pizza = 32 + 32;
 	
 	output(32 + 432+ 634 / 32 * 5423 - 24);
 	

@@ -6,7 +6,7 @@ class JujuParser extends Parser;
 {
 	private Program prog;
 	
-	private CommandIf comando;
+	private Variable<?> actualVar;
 
 	public String convertProgram()
 	{
@@ -17,7 +17,7 @@ class JujuParser extends Parser;
 		prog = new Program();
 	}
 
-	private void atrib(Variable<?> actualVar, int actualType, String actualValue) throws RecognitionException
+	private void atrib(int actualType, String actualValue) throws RecognitionException
 	{
 		if (actualVar == null) {
 			throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
@@ -82,7 +82,7 @@ declara		: T_tipo
 
 atrib		: T_id 
 			{
-				Variable actualVar = prog.getVariable(LT(0).getText());
+				actualVar = prog.getVariable(LT(0).getText());
 			}
 			T_atrib value
 			{
@@ -91,23 +91,19 @@ atrib		: T_id
 			T_pv
 			;
 
-value		: op_math | T_msg | T_num
+value		: op_math  | T_msg
 			;
 
 comandoIfElse	: 	"if" expr
  					"then"						
 					 (comando)+ 
 					 "end" 
+					 (
 					 "else" 
 					 "begin" 
 					 (comando)+ 
 					 "end"
-					| 
-					"if"
- 					expr
- 					"then"						
-					 (comando)+ 
-					"end" 
+					 )?
 				;
 				
 expr		:	{
@@ -155,7 +151,13 @@ operator  	: 	T_or
 			T_lt 
 		;
 		
-op_math			: (T_num (T_plus|T_minus|T_times|T_div) T_num)* T_pv
+op_math			:  (T_num 
+						(
+							(T_plus|T_minus|T_times|T_div)
+							
+							T_num
+						)*
+					)
 				;
 
 				
@@ -191,6 +193,9 @@ cmdEscrita :  "output" T_ap (T_id
 				;
 
 class JujuLexer extends Lexer;
+options {
+  k=2;
+}
 
 T_tipo			: "Int" | "String"
 				;
@@ -212,9 +217,6 @@ T_fp			: ')'
 
 T_atrib			: '='
 				;
-
-T_op_logico		: '<' | '>' | "<=" | ">=" | "==" | "!="
-				;
 	
 T_msg			: '\"' ( ('a'..'z') 
                        | ('0'..'9') 
@@ -223,20 +225,22 @@ T_msg			: '\"' ( ('a'..'z')
 					   )* 
 				   '\"'
 				;
-				
+T_eq			: "=="
+				;
 T_or			: "||"
 				;
 T_and 			: "&&"
 				;
-T_eq 			: "=="
-				;
 T_neq 			: "!="
 				;
-T_gt 			: ">="
+T_gt 			: ">"
 				;
-T_lt 			: "<="
+T_lt 			: "<"
 				;
-
+T_gteq			: ">="
+				;
+T_lteq			: "<="
+				;
 T_plus			: '+' ;
 
 T_minus			: '-' ;
@@ -245,7 +249,7 @@ T_div			: '/' ;
 
 T_times			: '*' ;
 
-T_num			: ('0'..'9')+ '.' ('0'..'9')+ | ('0'..'9')+
+T_num			: ('0'..'9')+ ('.' ('0'..'9')+)?
 				;
 
 T_ws        	: ('\n' | '\r' | '\t' | ' ') { $setType(Token.SKIP); }

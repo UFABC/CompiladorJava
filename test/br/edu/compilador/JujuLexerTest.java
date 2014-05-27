@@ -78,7 +78,7 @@ public class JujuLexerTest {
 	}
 	
 	@Test
-	public void test1Operations() throws RecognitionException, TokenStreamException {
+	public void test2Operations() throws RecognitionException, TokenStreamException {
 		setup("teste2.jj");
 		parser.init();
 		parser.programStart();
@@ -87,13 +87,23 @@ public class JujuLexerTest {
 	}
 	
 	@Test
-	public void test1IfFile() throws RecognitionException, TokenStreamException {
+	public void test3IfFile() throws RecognitionException, TokenStreamException {
 		setup("teste3.jj");
 		parser.init();
 		parser.programStart();
 		
 		
 		assertEquals(getStringFromInputStream(LoadInputStream("teste3.cpp")), parser.convertProgram());
+	}
+	
+	@Test
+	public void test4While() throws RecognitionException, TokenStreamException {
+		setup("teste4.jj");
+		parser.init();
+		parser.programStart();
+		
+		
+		assertEquals(getStringFromInputStream(LoadInputStream("teste4.cpp")), parser.convertProgram());
 	}
 
 }

@@ -1,0 +1,7 @@
+function testando4
+	int pizza;
+	while pizza < 5 do
+		output(pizza);
+		pizza = pizza + 1;
+	end
+end
