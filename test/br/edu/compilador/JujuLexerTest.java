@@ -46,5 +46,15 @@ public class JujuLexerTest {
 		
 		assertEquals("ConvertedCode;", parser.convertedProgram);
 	}
+	
+	@Test
+	public void test1IfFile() throws RecognitionException, TokenStreamException {
+		setup("teste3");
+		parser.init();
+		parser.programStart();
+		
+		
+		assertEquals("ConvertedCode;", parser.convertedProgram);
+	}
 
 }

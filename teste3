@@ -1,0 +1,10 @@
+function testando2
+	Int pizza;
+	
+	if pizza == 0 then
+		pizza = 43;
+	end
+	else
+		pizza = 328;
+	end
+end

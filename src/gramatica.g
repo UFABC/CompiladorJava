@@ -91,24 +91,7 @@ value		: T_msg | T_num
 			;
 
 comandoIfElse	: 	"if"{ComandoIf cmdif;}
- 					(T_id
- 					{
- 						cmdif.setExprL(LT(0).getText());
- 					} | T_msg)
- 					{
-						cmdif.setExprL(LT(0).getText());
- 					}
- 					operator
- 					{
- 						cmdif.setExprR(LT(0).getType());
- 					}
- 					(T_id
- 					{
- 						cmdif.setExprL(LT(0).getText());
- 					} | T_msg)
- 					{
-						cmdif.setExprL(LT(0).getText());
- 					}
+ 					expr
  					"then"{st.add(cmdif);} 								
 					 (comando)+ 
 					 "end" 
@@ -124,18 +107,33 @@ comandoIfElse	: 	"if"{ComandoIf cmdif;}
 					 "end" 
 				;
 				
+				
+expr	: termo       { comando.setExprL(LT(0).getText());}
+          ( exprl )* 
 
-operator  	: 	T_or
+	;
+
+exprl  	: 	T_or  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
 			|
-			T_and
+			T_and { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
 			|
-			T_eq 
+			T_eq  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
 			|
-			T_neq
+			T_neq  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
 			|
-			T_gt 
+			T_gt  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
 			|
-			T_lt 
+			T_lt  { cmdif.setExprR(Integer.setOperator(LT(0).getText()));}
+			termo 
+		;
+
+termo   : T_id 
+         { comando.setExprR(LT(0).getText());}
 		;
 		
 op_aritmetica   : "matematica"
