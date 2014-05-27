@@ -10,6 +10,8 @@ class JujuParser extends Parser;
 
 	private Expression<?> actualExpression;
 
+	private LogicExpression actualLogic;
+
 	public String convertProgram()
 	{
 		return prog.convert();
@@ -47,6 +49,24 @@ class JujuParser extends Parser;
 		else
 			return Integer.parseInt(actualValue);
 	}	 
+
+	private Object logicExpressTerm (String text, int type) throws RecognitionException
+	{
+		Object expressionTerm = null;
+
+		if(type == T_id)
+		{
+			IntegerVariable intVar = (IntegerVariable) prog.getVariable(text);
+			if (intVar == null)
+				throw new RecognitionException("Erro loco na sua expressao logica, esse bagulho nao ecxiste. Lembra que so comparo inteiro por conta de preguica mesmo.");
+
+			expressionTerm = intVar;
+		} else 
+		{
+			expressionTerm = toInt(text);
+		}
+		return expressionTerm;
+	}
 }
 
 programStart: (declara)* (function)*
@@ -102,88 +122,49 @@ atrib		: T_id
 value		: op_math  | op_text
 			;
 
-comandoIfElse	: 	"if" exprif "then" (comando)+ "end" "else" "begin" (comando)+  "end" 
-				|	"if" exprif "then" (comando)+ "end"
+comandoIfElse	: 	"if" exprif "then" (comando)+ "end" {prog.addCommand(new CommandEnd());}
+					("else" {prog.addCommand(new CommandElse()); } "begin" (comando)+  "end" {prog.addCommand(new CommandEnd());})?
 				;
 				
-exprif		:	{
-					CommandIf cmdif = new CommandIf();
-				}
-				(T_id
-				{	
-					if(prog.existsVariable(LT(0).getText())) {
-						cmdif.setExprL(LT(0).getText());
-					}
-					else {
-						throw new RecognitionException("Voce nao criou essa variavel");
-					}
-				} )		
-
-				operator
+exprif		:	expr
 				{
-					cmdif.setOperator(LT(0).getType());
-				}
-				(T_id
-				{	
-					if (prog.existsVariable(LT(0).getText())) {
-						cmdif.setExprR(LT(0).getText());
-					}
-					else 
-						throw new RecognitionException("Voce nao criou essa variavel");	
-				} | T_num {cmdif.setExprR(LT(0).getText());})
-				{prog.addCommand(cmdif);}	
+					CommandIf cmdif = new CommandIf(actualLogic);
+
+					prog.addCommand(cmdif);
+				}	
  			;
 			
-comandoWhile	: "while" exprwhile "then" (comando)+ "end" 
+comandoWhile	: "while" exprwhile "then" (comando)+ "end" {prog.addCommand(new CommandEnd());}
 				;
 				
-exprwhile		:{
-					CommandWhile cmdwhile = new CommandWhile();
-				}
-				(T_id
-				{	
-					if(prog.existsVariable(LT(0).getText())) {
-						cmdwhile.setExprL(LT(0).getText());
-					}
-					else {
-						throw new RecognitionException("Voce nao criou essa variavel");
-					}
-				} )
-				operator
+exprwhile		: expr
 				{
-					cmdwhile.setOperator(LT(0).getType());
+					CommandWhile cmdwhile = new CommandWhile(actualLogic);
+					
+					prog.addCommand(cmdwhile);
 				}
-				(T_id
-				{	
-					if (prog.existsVariable(LT(0).getText())) {
-						cmdwhile.setExprR(LT(0).getText());
-					}
-					else 
-						throw new RecognitionException("Voce nao criou essa variavel");	
-				} 
-				| T_msg {cmdwhile.setExprR(LT(0).getText());})
-				
-				|(T_id
-				{	
-					if(prog.existsVariable(LT(0).getText())) {
-						cmdwhile.setExprL(LT(0).getText());
-					}
-					else if((LT(0).getText()).equals("true") || LT(0).getText().equals("false")){
-						cmdwhile.setExprL(LT(0).getText());
-					}
-					else {
-						throw new RecognitionException("Voce nao criou essa variavel");
-					}
-				} | T_num
-					{
-						cmdwhile.setExprL(LT(0).getText());
-					}
-				)		
-				
-				{prog.addCommand(cmdwhile);}
 				
 				;
  		
+expr 			:		
+				expressTerm 
+				{
+					Object leftTerm = logicExpressTerm(LT(0).getText(),  LT(0).getType());
+				}
+				operator
+				{
+					int operator = LT(0).getType();
+				}
+				expressTerm
+				{
+					Object rightTerm = logicExpressTerm(LT(0).getText(),  LT(0).getType());
+
+					actualLogic = new LogicExpression(leftTerm, rightTerm, operator);
+				}
+				;
+
+expressTerm		: (T_id | T_num)
+				;
 
 operator  	: 	T_or
 			|
@@ -243,9 +224,9 @@ cmdEscrita :  "output" T_ap (T_id
 										   
 										}
                                        | 
-									   T_msg
+									   value
 									   {
-									       prog.addCommand(new CommandWrite(new String(LT(0).getText())));
+									       prog.addCommand(new CommandWrite(actualExpression));
 									   }
 									   ) T_fp T_pv
 				;

@@ -1,7 +1,7 @@
 function testando4
-	int pizza;
-	while pizza < 5 do
+	Int pizza;
+	while pizza < 5 then
 		output(pizza);
-		pizza = pizza + 1;
+		pizza = 5;
 	end
 end

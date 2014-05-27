@@ -45,9 +45,10 @@ public JujuLexer(LexerSharedInputState state) {
 	literals.put(new ANTLRHashString("if", this), new Integer(10));
 	literals.put(new ANTLRHashString("end", this), new Integer(6));
 	literals.put(new ANTLRHashString("begin", this), new Integer(13));
-	literals.put(new ANTLRHashString("input", this), new Integer(26));
+	literals.put(new ANTLRHashString("while", this), new Integer(14));
+	literals.put(new ANTLRHashString("input", this), new Integer(27));
 	literals.put(new ANTLRHashString("function", this), new Integer(4));
-	literals.put(new ANTLRHashString("output", this), new Integer(29));
+	literals.put(new ANTLRHashString("output", this), new Integer(30));
 	literals.put(new ANTLRHashString("then", this), new Integer(11));
 }
 
@@ -253,7 +254,7 @@ tryAgain:
 		matchRange('a','z');
 		}
 		{
-		_loop41:
+		_loop46:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -280,7 +281,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop41;
+				break _loop46;
 			}
 			}
 		} while (true);
@@ -364,7 +365,7 @@ tryAgain:
 		
 		match('\"');
 		{
-		_loop53:
+		_loop58:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -411,7 +412,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop53;
+				break _loop58;
 			}
 			}
 		} while (true);
@@ -586,34 +587,34 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt68=0;
-		_loop68:
+		int _cnt73=0;
+		_loop73:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt68>=1 ) { break _loop68; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt73>=1 ) { break _loop73; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt68++;
+			_cnt73++;
 		} while (true);
 		}
 		{
 		if ((LA(1)=='.')) {
 			match('.');
 			{
-			int _cnt71=0;
-			_loop71:
+			int _cnt76=0;
+			_loop76:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt71>=1 ) { break _loop71; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt76>=1 ) { break _loop76; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt71++;
+				_cnt76++;
 			} while (true);
 			}
 		}

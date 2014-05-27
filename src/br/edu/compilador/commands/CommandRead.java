@@ -49,8 +49,7 @@ public class CommandRead extends Command{
 
 	@Override
 	public String toC() {
-		// TODO Auto-generated method stub
-		return null;
+		return "cin >> " + var.name;
 	}
     
     

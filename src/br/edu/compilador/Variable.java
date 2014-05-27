@@ -25,4 +25,8 @@ public abstract class Variable<Type> implements Symbol {
 	}
 	
 	public abstract Variable<?> copy ();
+	
+	public String toString(){
+		return name;
+	}
 }

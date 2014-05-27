@@ -1,9 +1,13 @@
 package br.edu.compilador.commands;
 
+import br.edu.compilador.LogicExpression;
+
 public class CommandIf extends Command{
-	public Object exprL;
-	public Object exprR;
-	public int operator;
+	public LogicExpression logic;
+	
+	public CommandIf(LogicExpression expression) {
+		this.logic = expression;
+	}
 	
 	@Override
 	public void run() {
@@ -14,6 +18,7 @@ public class CommandIf extends Command{
 	@Override
 	public String toC() {
 		String ifExpression = "if (";
+		ifExpression += this.logic.toC();
 		return ifExpression + ") {";
 	}
 }

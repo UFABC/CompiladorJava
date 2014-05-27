@@ -1,5 +1,6 @@
 package br.edu.compilador.commands;
 
+import br.edu.compilador.Expression;
 import br.edu.compilador.Variable;
 
 /*
@@ -36,7 +37,14 @@ public class CommandWrite extends Command {
 
 	@Override
 	public String toC() {
-		// TODO Auto-generated method stub
-		return null;
+		String cCode = "cout << ";
+        if (elemento instanceof Variable) {
+            Variable<?> var = (Variable<?>)elemento;
+            cCode += var.getName();
+        } else if (elemento instanceof Expression<?>) {
+            String s = ((Expression<?>) elemento).toC();
+            cCode += s;
+        }		
+        return cCode + ";";
 	}
 }

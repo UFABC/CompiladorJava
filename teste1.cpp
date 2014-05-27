@@ -12,5 +12,7 @@ string testeatrib = "";
 
 testeatrib = "f";
 
+cout << "teste";
+
 return 0;
 }
