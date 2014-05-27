@@ -1,14 +1,15 @@
 package br.edu.compilador;
 
-public class Function extends Symbol{
+public class Function implements Symbol{
+	public String name;
+	
 	public Function(String name) {
 		this.name = name;
 	}
 
 	@Override
-	public String toC() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getName() {
+		return name;
 	}
 
 }

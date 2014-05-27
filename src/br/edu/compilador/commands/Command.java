@@ -1,4 +1,5 @@
-package br.edu.compilador;
+package br.edu.compilador.commands;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -8,6 +9,8 @@ package br.edu.compilador;
  *
  * @author francisco.massetto
  */
-public abstract class Comando extends Symbol {
+public abstract class Command {
     public abstract void run();
+    
+    public abstract String toC();
 }

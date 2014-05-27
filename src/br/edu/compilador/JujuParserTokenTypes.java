@@ -22,12 +22,15 @@ public interface JujuParserTokenTypes {
 	int T_neq = 19;
 	int T_gt = 20;
 	int T_lt = 21;
-	int LITERAL_matematica = 22;
-	int LITERAL_input = 23;
-	int T_ap = 24;
-	int T_fp = 25;
-	int LITERAL_output = 26;
-	int T_vir = 27;
-	int T_op_logico = 28;
-	int T_ws = 29;
+	int T_plus = 22;
+	int T_minus = 23;
+	int T_times = 24;
+	int T_div = 25;
+	int LITERAL_input = 26;
+	int T_ap = 27;
+	int T_fp = 28;
+	int LITERAL_output = 29;
+	int T_vir = 30;
+	int T_op_logico = 31;
+	int T_ws = 32;
 }

@@ -42,13 +42,12 @@ public JujuLexer(LexerSharedInputState state) {
 	setCaseSensitive(true);
 	literals = new Hashtable();
 	literals.put(new ANTLRHashString("else", this), new Integer(14));
-	literals.put(new ANTLRHashString("matematica", this), new Integer(22));
 	literals.put(new ANTLRHashString("if", this), new Integer(12));
 	literals.put(new ANTLRHashString("end", this), new Integer(6));
 	literals.put(new ANTLRHashString("begin", this), new Integer(15));
-	literals.put(new ANTLRHashString("input", this), new Integer(23));
+	literals.put(new ANTLRHashString("input", this), new Integer(26));
 	literals.put(new ANTLRHashString("function", this), new Integer(4));
-	literals.put(new ANTLRHashString("output", this), new Integer(26));
+	literals.put(new ANTLRHashString("output", this), new Integer(29));
 	literals.put(new ANTLRHashString("then", this), new Integer(13));
 }
 
@@ -119,6 +118,30 @@ tryAgain:
 				case '&':
 				{
 					mT_and(true);
+					theRetToken=_returnToken;
+					break;
+				}
+				case '+':
+				{
+					mT_plus(true);
+					theRetToken=_returnToken;
+					break;
+				}
+				case '-':
+				{
+					mT_minus(true);
+					theRetToken=_returnToken;
+					break;
+				}
+				case '/':
+				{
+					mT_div(true);
+					theRetToken=_returnToken;
+					break;
+				}
+				case '*':
+				{
+					mT_times(true);
 					theRetToken=_returnToken;
 					break;
 				}
@@ -224,7 +247,7 @@ tryAgain:
 		matchRange('a','z');
 		}
 		{
-		_loop35:
+		_loop37:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -251,7 +274,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop35;
+				break _loop37;
 			}
 			}
 		} while (true);
@@ -375,7 +398,7 @@ tryAgain:
 		
 		match('\"');
 		{
-		_loop48:
+		_loop50:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -422,7 +445,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop48;
+				break _loop50;
 			}
 			}
 		} while (true);
@@ -513,6 +536,58 @@ tryAgain:
 		_returnToken = _token;
 	}
 	
+	public final void mT_plus(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = T_plus;
+		int _saveIndex;
+		
+		match('+');
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mT_minus(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = T_minus;
+		int _saveIndex;
+		
+		match('-');
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mT_div(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = T_div;
+		int _saveIndex;
+		
+		match('/');
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mT_times(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = T_times;
+		int _saveIndex;
+		
+		match('*');
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
 	public final void mT_num(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
 		_ttype = T_num;
@@ -520,48 +595,48 @@ tryAgain:
 		
 		if (((LA(1) >= '0' && LA(1) <= '9'))) {
 			{
-			int _cnt57=0;
-			_loop57:
+			int _cnt63=0;
+			_loop63:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt57>=1 ) { break _loop57; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt63>=1 ) { break _loop63; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt57++;
+				_cnt63++;
 			} while (true);
 			}
 			match('.');
 			{
-			int _cnt59=0;
-			_loop59:
+			int _cnt65=0;
+			_loop65:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt59>=1 ) { break _loop59; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt65>=1 ) { break _loop65; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt59++;
+				_cnt65++;
 			} while (true);
 			}
 		}
 		else if (((LA(1) >= '0' && LA(1) <= '9'))) {
 			{
-			int _cnt61=0;
-			_loop61:
+			int _cnt67=0;
+			_loop67:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt61>=1 ) { break _loop61; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt67>=1 ) { break _loop67; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt61++;
+				_cnt67++;
 			} while (true);
 			}
 		}

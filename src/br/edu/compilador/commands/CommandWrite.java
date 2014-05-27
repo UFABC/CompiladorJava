@@ -1,4 +1,6 @@
-package br.edu.compilador;
+package br.edu.compilador.commands;
+
+import br.edu.compilador.Variable;
 
 /*
  * To change this template, choose Tools | Templates
@@ -7,17 +9,17 @@ package br.edu.compilador;
 
 /**
  *
- * @author francisco.massetto
+ * @author Juju
  */
-public class ComandoEscrita extends Comando {
+public class CommandWrite extends Command {
 
     private Object elemento;
 
-    public ComandoEscrita(Object elemento) {
+    public CommandWrite(Object elemento) {
         this.elemento = elemento;
     }
 
-    public ComandoEscrita() {
+    public CommandWrite() {
     }
 
     @Override

@@ -18,13 +18,8 @@ public class RTSymbolTable {
         symbols = new ArrayList<Symbol>();
     }
     
-    public void add(Symbol element){
-    	System.out.println("Add element: " + element.getName());
-        symbols.add(element);
-    }
-    
     public void add(Variable<?> element){
-    	System.out.println("Add element: " + element.getName());
+//    	System.out.println("Add element: " + element.getName());
         symbols.add(element);
     }
     
@@ -46,5 +41,8 @@ public class RTSymbolTable {
     	}
     	return null;
     }
-    
+
+	public void add(Function function) {
+		symbols.add(function);
+	}
 }

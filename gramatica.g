@@ -1,16 +1,19 @@
+{
+import br.edu.compilador.commands.*;
+}
+
 class JujuParser extends Parser;
 {
-    private RTSymbolTable st;
-
-	private Variable var;
 	private Program prog;
 	
-	private ComandoIf comando;
+	private CommandIf comando;
 
-	public String convertedProgram;
+	public String convertProgram()
+	{
+		return prog.convert();
+	}
 	 
 	public void init(){
-	    st = new RTSymbolTable();	 
 		prog = new Program();
 	}
 
@@ -21,36 +24,37 @@ class JujuParser extends Parser;
 		} else {
 			if (actualType == T_msg) {
 				if (actualVar instanceof StringVariable){
-					((StringVariable) actualVar).setValue(actualValue);										
+					prog.addCommand(new CommandAttribution(actualVar, actualValue));										
 				}
 				else
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
 			} else if (actualType == T_num) {
 				if (actualVar instanceof IntegerVariable) {
 					if (actualValue.contains("."))
-						((IntegerVariable) actualVar).setValue(Math.round(Float.parseFloat(actualValue)));
+						prog.addCommand(new CommandAttribution(actualVar, Math.round(Float.parseFloat(actualValue))));
 					else
-						((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));	
+						prog.addCommand(new CommandAttribution(actualVar, Integer.parseInt(actualValue)));
 				} else {
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem numero nos texto");										
 				}
 			}
 		}	
-	}
-	 
+	}	 
 }
 
 programStart: (declara)* (function)*
-				{
-					convertedProgram = prog.convert();
-				}
 			;
 
 function	:  "function" T_id  
 				{
-					st.add(new Function(LT(0).getText()));
+					prog.addCommand(new CommandFunction(LT(0).getText()));
 				}
 				(comando)+ "end"
+				{
+					prog.addCommand(new CommandReturn());
+
+					prog.addCommand(new CommandEnd());
+				}
 			;
 
 comando   	: cmdLeitura 
@@ -67,9 +71,9 @@ declara		: T_tipo
 			T_id
                    {
                    		if (tipo.equals("Int")) {
-                   			st.add(new IntegerVariable(LT(0).getText()));
+                   			prog.addCommand(new CommandNew (new IntegerVariable(LT(0).getText())));
                    		} else if (tipo.equals("String")) {
-                   			st.add(new StringVariable(LT(0).getText()));                   			
+                   			prog.addCommand(new CommandNew (new StringVariable(LT(0).getText())));	
                    		}
 				        
 				   }
@@ -78,7 +82,7 @@ declara		: T_tipo
 
 atrib		: T_id 
 			{
-				Variable actualVar = (Variable) st.getSymbol(LT(0).getText(), Variable.class);
+				Variable actualVar = prog.getVariable(LT(0).getText());
 			}
 			T_atrib value
 			{
@@ -87,45 +91,56 @@ atrib		: T_id
 			T_pv
 			;
 
-value		: T_msg | T_num
+value		: op_math | T_msg | T_num
 			;
 
-comandoIfElse	: 	"if"{ComandoIf cmdif;}
- 					(T_id
- 					{	if(st.exists(T_id){
- 							cmdif.setExprL(LT(0).getText());
- 							}
- 						else 
- 							throw new RecognitionException("Voce não criou essa variavel");	
- 					} | T_msg {cmdif.setExprL(LT(0).getText());})		
-
- 					operator
- 					{
- 						cmdif.setOperator(LT(0).getType());
- 					}
- 					(T_id
- 					{	if(st.exists(T_id){
- 							cmdif.setExprR(LT(0).getText());
- 							}
- 						else 
- 							throw new RecognitionException("Voce não criou essa variavel");	
- 					} | T_msg {cmdif.setExprR(LT(0).getText());})	
-
- 					"then"{st.add(cmdif);} 								
+comandoIfElse	: 	"if" expr
+ 					"then"						
 					 (comando)+ 
 					 "end" 
 					 "else" 
-					 "begin"{ComandoIf cmdelse;} 
+					 "begin" 
 					 (comando)+ 
 					 "end"
 					| 
-					"if"{ComandoIf cmdif;}
+					"if"
  					expr
- 					"then"{st.add(cmdif);} 								
+ 					"then"						
 					 (comando)+ 
-					 "end" 
+					"end" 
 				;
 				
+expr		:	{
+					CommandIf cmdif = new CommandIf();
+				}
+				(T_id
+				{	
+					if(prog.existsVariable(LT(0).getText())) {
+						cmdif.setExprL(LT(0).getText());
+					}
+					else {
+						throw new RecognitionException("Voce nao criou essa variavel");
+					}
+				} | T_msg
+					{
+						cmdif.setExprL(LT(0).getText());
+					}
+				)		
+
+				operator
+				{
+					cmdif.setOperator(LT(0).getType());
+				}
+				(T_id
+				{	
+					if (prog.existsVariable(LT(0).getText())) {
+						cmdif.setExprR(LT(0).getText());
+					}
+					else 
+						throw new RecognitionException("Voce nao criou essa variavel");	
+				} | T_msg {cmdif.setExprR(LT(0).getText());})
+				{prog.addCommand(cmdif);}	
+ 			;
 
 operator  	: 	T_or
 			|
@@ -140,35 +155,37 @@ operator  	: 	T_or
 			T_lt 
 		;
 		
-op_aritmetica   : "matematica"
+op_math			: (T_num (T_plus|T_minus|T_times|T_div) T_num)* T_pv
 				;
+
 				
 cmdLeitura :  "input" T_ap T_id
                     {
-					       if (!st.exists(LT(0).getText(), Variable.class)){
-						       System.err.println("Variavel nao declarada");
-						   }
+                    	Variable var = prog.getVariable(LT(0).getText());
+					    if (var == null){
+							System.err.println("Variavel nao declarada");
+						}
 					}
 
                     T_fp T_pv
 					{
-					     prog.addComando(new ComandoLeitura(var));
+					     prog.addCommand(new CommandRead(var));
 					}
 				;
 				
 cmdEscrita :  "output" T_ap (T_id 
 										{
-										   	var = (Variable) st.getSymbol(LT(0).getText(), Variable.class);
+										   	Variable var = prog.getVariable(LT(0).getText());
 											if (var == null) {
 												throw new RecognitionException("Variavel nao declarada");
 											} else
-										 	prog.addComando(new ComandoEscrita(var));
+										 	prog.addCommand(new CommandWrite(var));
 										   
 										}
                                        | 
 									   T_msg
 									   {
-									       prog.addComando(new ComandoEscrita(new String(LT(0).getText())));
+									       prog.addCommand(new CommandWrite(new String(LT(0).getText())));
 									   }
 									   ) T_fp T_pv
 				;
@@ -219,6 +236,14 @@ T_gt 			: ">="
 				;
 T_lt 			: "<="
 				;
+
+T_plus			: '+' ;
+
+T_minus			: '-' ;
+
+T_div			: '/' ;
+
+T_times			: '*' ;
 
 T_num			: ('0'..'9')+ '.' ('0'..'9')+ | ('0'..'9')+
 				;

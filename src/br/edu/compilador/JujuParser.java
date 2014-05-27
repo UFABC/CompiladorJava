@@ -15,20 +15,21 @@ import antlr.SemanticException;
 import antlr.ParserSharedInputState;
 import antlr.collections.impl.BitSet;
 
+import br.edu.compilador.commands.*;
+
 public class JujuParser extends antlr.LLkParser       implements JujuParserTokenTypes
  {
 
-    private RTSymbolTable st;
-
-	private Variable var;
 	private Program prog;
 	
-	private ComandoIf comando;
+	private CommandIf comando;
 
-	public String convertedProgram;
+	public String convertProgram()
+	{
+		return prog.convert();
+	}
 	 
 	public void init(){
-	    st = new RTSymbolTable();	 
 		prog = new Program();
 	}
 
@@ -39,23 +40,22 @@ public class JujuParser extends antlr.LLkParser       implements JujuParserToken
 		} else {
 			if (actualType == T_msg) {
 				if (actualVar instanceof StringVariable){
-					((StringVariable) actualVar).setValue(actualValue);										
+					prog.addCommand(new CommandAttribution(actualVar, actualValue));										
 				}
 				else
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
 			} else if (actualType == T_num) {
 				if (actualVar instanceof IntegerVariable) {
 					if (actualValue.contains("."))
-						((IntegerVariable) actualVar).setValue(Math.round(Float.parseFloat(actualValue)));
+						prog.addCommand(new CommandAttribution(actualVar, Math.round(Float.parseFloat(actualValue))));
 					else
-						((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));	
+						prog.addCommand(new CommandAttribution(actualVar, Integer.parseInt(actualValue)));
 				} else {
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem numero nos texto");										
 				}
 			}
 		}	
-	}
-	 
+	}	 
 
 protected JujuParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
@@ -108,9 +108,6 @@ public JujuParser(ParserSharedInputState state) {
 				
 			} while (true);
 			}
-			
-								convertedProgram = prog.convert();
-							
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -129,9 +126,9 @@ public JujuParser(ParserSharedInputState state) {
 			match(T_id);
 			
 					if (tipo.equals("Int")) {
-						st.add(new IntegerVariable(LT(0).getText()));
+						prog.addCommand(new CommandNew (new IntegerVariable(LT(0).getText())));
 					} else if (tipo.equals("String")) {
-						st.add(new StringVariable(LT(0).getText()));                   			
+						prog.addCommand(new CommandNew (new StringVariable(LT(0).getText())));	
 					}
 							        
 							
@@ -150,7 +147,7 @@ public JujuParser(ParserSharedInputState state) {
 			match(LITERAL_function);
 			match(T_id);
 			
-								st.add(new Function(LT(0).getText()));
+								prog.addCommand(new CommandFunction(LT(0).getText()));
 							
 			{
 			int _cnt8=0;
@@ -167,6 +164,11 @@ public JujuParser(ParserSharedInputState state) {
 			} while (true);
 			}
 			match(LITERAL_end);
+			
+								prog.addCommand(new CommandReturn());
+			
+								prog.addCommand(new CommandEnd());
+							
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -224,14 +226,15 @@ public JujuParser(ParserSharedInputState state) {
 			match(T_ap);
 			match(T_id);
 			
-								       if (!st.exists(LT(0).getText(), Variable.class)){
-									       System.err.println("Variavel nao declarada");
-									   }
+				Variable var = prog.getVariable(LT(0).getText());
+								    if (var == null){
+										System.err.println("Variavel nao declarada");
+									}
 								
 			match(T_fp);
 			match(T_pv);
 			
-								     prog.addComando(new ComandoLeitura(var));
+								     prog.addCommand(new CommandRead(var));
 								
 		}
 		catch (RecognitionException ex) {
@@ -252,11 +255,11 @@ public JujuParser(ParserSharedInputState state) {
 			{
 				match(T_id);
 				
-														   	var = (Variable) st.getSymbol(LT(0).getText(), Variable.class);
+														   	Variable var = prog.getVariable(LT(0).getText());
 															if (var == null) {
 																throw new RecognitionException("Variavel nao declarada");
 															} else
-														 	prog.addComando(new ComandoEscrita(var));
+														 	prog.addCommand(new CommandWrite(var));
 														   
 														
 				break;
@@ -265,7 +268,7 @@ public JujuParser(ParserSharedInputState state) {
 			{
 				match(T_msg);
 				
-													       prog.addComando(new ComandoEscrita(new String(LT(0).getText())));
+													       prog.addCommand(new CommandWrite(new String(LT(0).getText())));
 													
 				break;
 			}
@@ -290,10 +293,8 @@ public JujuParser(ParserSharedInputState state) {
 		try {      // for error handling
 			if ((LA(1)==LITERAL_if)) {
 				match(LITERAL_if);
-				ComandoIf cmdif = null;
 				expr();
 				match(LITERAL_then);
-				st.add(cmdif);
 				{
 				int _cnt15=0;
 				_loop15:
@@ -311,7 +312,6 @@ public JujuParser(ParserSharedInputState state) {
 				match(LITERAL_end);
 				match(LITERAL_else);
 				match(LITERAL_begin);
-				ComandoIf cmdelse;
 				{
 				int _cnt17=0;
 				_loop17:
@@ -330,10 +330,8 @@ public JujuParser(ParserSharedInputState state) {
 			}
 			else if ((LA(1)==LITERAL_if)) {
 				match(LITERAL_if);
-				ComandoIf cmdif = null;
 				expr();
 				match(LITERAL_then);
-				st.add(cmdif);
 				{
 				int _cnt19=0;
 				_loop19:
@@ -367,7 +365,7 @@ public JujuParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(T_id);
 			
-							Variable actualVar = (Variable) st.getSymbol(LT(0).getText(), Variable.class);
+							Variable actualVar = prog.getVariable(LT(0).getText());
 						
 			match(T_atrib);
 			value();
@@ -413,20 +411,69 @@ public JujuParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			termo();
-			comando.setExprL(LT(0).getText());
+			
+								CommandIf cmdif = new CommandIf();
+							
 			{
-			_loop22:
-			do {
-				if (((LA(1) >= T_or && LA(1) <= T_lt))) {
-					exprl();
-				}
-				else {
-					break _loop22;
-				}
-				
-			} while (true);
+			switch ( LA(1)) {
+			case T_id:
+			{
+				match(T_id);
+					
+									if(prog.existsVariable(LT(0).getText())) {
+										cmdif.setExprL(LT(0).getText());
+									}
+									else {
+										throw new RecognitionException("Voce nao criou essa variavel");
+									}
+								
+				break;
 			}
+			case T_msg:
+			{
+				match(T_msg);
+				
+										cmdif.setExprL(LT(0).getText());
+									
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			operator();
+			
+								cmdif.setOperator(LT(0).getType());
+							
+			{
+			switch ( LA(1)) {
+			case T_id:
+			{
+				match(T_id);
+					
+									if (prog.existsVariable(LT(0).getText())) {
+										cmdif.setExprR(LT(0).getText());
+									}
+									else 
+										throw new RecognitionException("Voce nao criou essa variavel");	
+								
+				break;
+			}
+			case T_msg:
+			{
+				match(T_msg);
+				cmdif.setExprR(LT(0).getText());
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+			prog.addCommand(cmdif);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -434,12 +481,46 @@ public JujuParser(ParserSharedInputState state) {
 		}
 	}
 	
-	public final void termo() throws RecognitionException, TokenStreamException {
+	public final void operator() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
-			match(T_id);
-			comando.setExprR(LT(0).getText());
+			switch ( LA(1)) {
+			case T_or:
+			{
+				match(T_or);
+				break;
+			}
+			case T_and:
+			{
+				match(T_and);
+				break;
+			}
+			case T_eq:
+			{
+				match(T_eq);
+				break;
+			}
+			case T_neq:
+			{
+				match(T_neq);
+				break;
+			}
+			case T_gt:
+			{
+				match(T_gt);
+				break;
+			}
+			case T_lt:
+			{
+				match(T_lt);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -447,62 +528,52 @@ public JujuParser(ParserSharedInputState state) {
 		}
 	}
 	
-	public final void exprl() throws RecognitionException, TokenStreamException {
+	public final void op_math() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
-			ifSwitch();
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
-		}
-	}
-
-	private void ifSwitch(ComandoIf cmdif, int type) {
-		switch ( LA(0)) {
-		case T_or:
-		{
-			cmdif.setExprR(Integer.setOperator(LT(0).getText()));
-			break;
-		}
-		case T_and:
-		{
-			cmdif.setExprR();
-			break;
-		}
-		case T_eq:
-		{
-			cmdif.setExprR(Integer.setOperator(LT(0).getText()));
-			break;
-		}
-		case T_neq:
-		{
-			cmdif.setExprR(Integer.setOperator(LT(0).getText()));
-			break;
-		}
-		case T_gt:
-		{
-			cmdif.setExprR(Integer.setOperator(LT(0).getText()));
-			break;
-		}
-		case T_lt:
-		{
-			cmdif.setExprR(Integer.setOperator(LT(0).getText()));
-			break;
-		}
-		default:
-		{
-			throw new NoViableAltException(LT(1), getFilename());
-		}
-		}
-	}
-	
-	public final void op_aritmetica() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			match(LITERAL_matematica);
+			{
+			_loop27:
+			do {
+				if ((LA(1)==T_num)) {
+					match(T_num);
+					{
+					switch ( LA(1)) {
+					case T_plus:
+					{
+						match(T_plus);
+						break;
+					}
+					case T_minus:
+					{
+						match(T_minus);
+						break;
+					}
+					case T_times:
+					{
+						match(T_times);
+						break;
+					}
+					case T_div:
+					{
+						match(T_div);
+						break;
+					}
+					default:
+					{
+						throw new NoViableAltException(LT(1), getFilename());
+					}
+					}
+					}
+					match(T_num);
+				}
+				else {
+					break _loop27;
+				}
+				
+			} while (true);
+			}
+			match(T_pv);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -534,7 +605,10 @@ public JujuParser(ParserSharedInputState state) {
 		"T_neq",
 		"T_gt",
 		"T_lt",
-		"\"matematica\"",
+		"T_plus",
+		"T_minus",
+		"T_times",
+		"T_div",
 		"\"input\"",
 		"T_ap",
 		"T_fp",
@@ -550,12 +624,12 @@ public JujuParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 75501810L, 0L};
+		long[] data = { 603984114L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	private static final long[] mk_tokenSet_2() {
-		long[] data = { 75501728L, 0L};
+		long[] data = { 603984032L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
@@ -565,7 +639,7 @@ public JujuParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 75501792L, 0L};
+		long[] data = { 603984096L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
@@ -580,7 +654,7 @@ public JujuParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 4136960L, 0L};
+		long[] data = { 1056L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());

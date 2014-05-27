@@ -4,4 +4,8 @@ function testando2
 	pizza = 32.5 + 32;
 	
 	output(32 + 432+ 634 / 32 * 5423 - 24);
+	
+	String limao;
+	
+	limao = "teste " + " lasanha";
 end

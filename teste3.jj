@@ -5,6 +5,11 @@ function testando2
 		pizza = 43;
 	end
 	else
+	begin
 		pizza = 328;
+	end
+	
+	if pizza == 328 then
+		pizza = 0;
 	end
 end

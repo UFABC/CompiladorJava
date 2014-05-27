@@ -1,6 +1,6 @@
-package br.edu.compilador;
+package br.edu.compilador.commands;
 
-public class ComandoIf extends Comando{
+public class CommandIf extends Command{
 	public Object exprL;
 	public Object exprR;
 	public int operator;
@@ -13,8 +13,8 @@ public class ComandoIf extends Comando{
 
 	@Override
 	public String toC() {
-		// TODO Auto-generated method stub
-		return null;
+		String ifExpression = "if (";
+		return ifExpression + ") {";
 	}
 
 	public Object getExprL() {

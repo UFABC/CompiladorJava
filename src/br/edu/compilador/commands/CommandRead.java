@@ -1,4 +1,8 @@
-package br.edu.compilador;
+package br.edu.compilador.commands;
+
+import br.edu.compilador.IntegerVariable;
+import br.edu.compilador.StringVariable;
+import br.edu.compilador.Variable;
 
 /*
  * To change this template, choose Tools | Templates
@@ -7,16 +11,16 @@ package br.edu.compilador;
 
 /**
  *
- * @author francisco.massetto
+ * @author Juju
  */
-public class ComandoLeitura extends Comando{
+public class CommandRead extends Command{
     private Variable var;
 
-    public ComandoLeitura(Variable var) {
+    public CommandRead(Variable var) {
         this.var = var;
     }
     
-    public ComandoLeitura(){
+    public CommandRead(){
         
     }
     
