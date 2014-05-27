@@ -1,4 +1,3 @@
-package br.edu.compilador;
 // $ANTLR 2.7.6 (2005-12-22): "gramatica.g" -> "JujuParser.java"$
 
 import antlr.TokenBuffer;
@@ -44,10 +43,7 @@ public class JujuParser extends antlr.LLkParser       implements JujuParserToken
 			} else if (actualType == T_num) {
 				if (actualVar instanceof IntegerVariable)
 				{
-					if (actualValue.contains("."))
-						((IntegerVariable) actualVar).setValue(Math.round(Float.parseFloat(actualValue)));
-					else
-						((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));																				
+					((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));																				
 				} else {
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem numero nos texto");										
 				}

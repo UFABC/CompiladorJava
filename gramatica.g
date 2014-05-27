@@ -12,13 +12,11 @@ class JujuParser extends Parser;
 		prog = new Program();
 	}
 
-	private void atrib(Variable<?> actualVar)
+	private void atrib(Variable<?> actualVar, int actualType, String actualValue) throws RecognitionException
 	{
 		if (actualVar == null) {
 			throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
 		} else {
-			int actualType = LT(0).getType();
-			String actualValue = LT(0).getText();
 			if (actualType == T_msg) {
 				if (actualVar instanceof StringVariable){
 					((StringVariable) actualVar).setValue(actualValue);										
@@ -26,9 +24,11 @@ class JujuParser extends Parser;
 				else
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
 			} else if (actualType == T_num) {
-				if (actualVar instanceof IntegerVariable)
-				{
-					((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));																				
+				if (actualVar instanceof IntegerVariable) {
+					if (actualValue.contains("."))
+						((IntegerVariable) actualVar).setValue(Math.round(Float.parseFloat(actualValue)));
+					else
+						((IntegerVariable) actualVar).setValue(Integer.parseInt(actualValue));	
 				} else {
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem numero nos texto");										
 				}
@@ -80,7 +80,7 @@ atrib		: T_id
 			}
 			T_atrib value
 			{
-				atrib(actualVar);
+				atrib(actualVar, LT(0).getType(), LT(0).getText());
 			}
 			T_pv
 			;
@@ -161,7 +161,7 @@ T_msg			: '\"' ( ('a'..'z')
 				   '\"'
 				;
 
-T_num			:('0'..'9')+ | ('0'..'9')+ T_vir ('0'..'9')+
+T_num			: ('0'..'9')+ '.' ('0'..'9')+ | ('0'..'9')+
 				;
 
 T_ws        	: ('\n' | '\r' | '\t' | ' ') { $setType(Token.SKIP); }
