@@ -8,6 +8,8 @@ class JujuParser extends Parser;
 	
 	private Variable<?> actualVar;
 
+	private Expression<?> actualExpression;
+
 	public String convertProgram()
 	{
 		return prog.convert();
@@ -17,28 +19,33 @@ class JujuParser extends Parser;
 		prog = new Program();
 	}
 
-	private void atrib(int actualType, String actualValue) throws RecognitionException
+	private void atrib(int actualType) throws RecognitionException
 	{
 		if (actualVar == null) {
 			throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
 		} else {
-			if (actualType == T_msg) {
+			if (actualType == T_msg && (actualExpression instanceof StringExpression)) {
 				if (actualVar instanceof StringVariable){
-					prog.addCommand(new CommandAttribution(actualVar, actualValue));										
+					prog.addCommand(new CommandAttribution(actualVar, actualExpression));										
 				}
 				else
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem texto nos numero");
-			} else if (actualType == T_num) {
+			} else if (actualType == T_num && (actualExpression instanceof MathExpression)) {
 				if (actualVar instanceof IntegerVariable) {
-					if (actualValue.contains("."))
-						prog.addCommand(new CommandAttribution(actualVar, Math.round(Float.parseFloat(actualValue))));
-					else
-						prog.addCommand(new CommandAttribution(actualVar, Integer.parseInt(actualValue)));
+					prog.addCommand(new CommandAttribution(actualVar, actualExpression));
 				} else {
 					throw new RecognitionException("Ish ta atribuindo errado isso ae, verifica que tem numero nos texto");										
 				}
 			}
 		}	
+	}
+
+	private Integer toInt(String actualValue)
+	{
+		if (actualValue.contains("."))
+			return Math.round(Float.parseFloat(actualValue));
+		else
+			return Integer.parseInt(actualValue);
 	}	 
 }
 
@@ -86,12 +93,12 @@ atrib		: T_id
 			}
 			T_atrib value
 			{
-				atrib(actualVar, LT(0).getType(), LT(0).getText());
+				atrib(LT(0).getType());
 			}
 			T_pv
 			;
 
-value		: op_math  | T_msg
+value		: op_math  | op_text
 			;
 
 comandoIfElse	: 	"if" expr
@@ -112,29 +119,34 @@ expr		:	{
 				(T_id
 				{	
 					if(prog.existsVariable(LT(0).getText())) {
-						cmdif.setExprL(LT(0).getText());
+						//cmdif.setExprL(LT(0).getText());
+						System.out.println("teste");
 					}
 					else {
 						throw new RecognitionException("Voce nao criou essa variavel");
 					}
 				} | T_msg
 					{
-						cmdif.setExprL(LT(0).getText());
+						//cmdif.setExprL(LT(0).getText());
+						System.out.println("teste");
 					}
 				)		
 
 				operator
 				{
-					cmdif.setOperator(LT(0).getType());
+					//cmdif.setOperator(LT(0).getType());
+					System.out.println("teste");
 				}
 				(T_id
 				{	
 					if (prog.existsVariable(LT(0).getText())) {
-						cmdif.setExprR(LT(0).getText());
+						//cmdif.setExprR(LT(0).getText());
+						System.out.println("teste");
 					}
 					else 
 						throw new RecognitionException("Voce nao criou essa variavel");	
-				} | T_msg {cmdif.setExprR(LT(0).getText());})
+				} | T_msg {//cmdif.setExprR(LT(0).getText());
+				System.out.println("teste");})
 				{prog.addCommand(cmdif);}	
  			;
 
@@ -151,16 +163,27 @@ operator  	: 	T_or
 			T_lt 
 		;
 		
-op_math			:  (T_num 
-						(
-							(T_plus|T_minus|T_times|T_div)
-							
-							T_num
+op_math			: 
+					(T_num {actualExpression = new MathExpression(toInt(LT(0).getText()));}
+						( {int type = 0;}
+							(T_plus  {type = LT(0).getType();}
+							|T_minus {type = LT(0).getType();}
+							|T_times {type = LT(0).getType();}
+							|T_div	 {type = LT(0).getType();}
+							)
+							T_num {((MathExpression) actualExpression).add(toInt(LT(0).getText()), type);}
 						)*
 					)
 				;
 
-				
+op_text			: 
+					(T_msg {actualExpression = new StringExpression(LT(0).getText());}
+						( {int type = 0;}
+							T_plus  {type = LT(0).getType();}
+							T_msg {((StringExpression) actualExpression).add(LT(0).getText(), type);}
+						)*
+					)
+				;				
 cmdLeitura :  "input" T_ap T_id
                     {
                     	Variable var = prog.getVariable(LT(0).getText());

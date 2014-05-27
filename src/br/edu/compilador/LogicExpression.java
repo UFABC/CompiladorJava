@@ -14,31 +14,8 @@ public class LogicExpression {
 	
 	public String toC()
 	{
-		return left.toString() + " " + symbolToString()  + " " + right.toString();
+		return left.toString() + " " + JujuUtils.tokenToString(operator)  + " " + right.toString();
 	}
 	
-	public String symbolToString () {
-		switch (operator) {
-		case JujuParserTokenTypes.T_and:
-			return "&&";
-			
-		case JujuParserTokenTypes.T_or:
-			return "||";
-			
-		case JujuParserTokenTypes.T_lt:
-			return "<";
-			
-		case JujuParserTokenTypes.T_lteq:
-			return "<=";
-			
-		case JujuParserTokenTypes.T_gt:
-			return ">";
-			
-		case JujuParserTokenTypes.T_gteq:
-			return ">=";
-		default:
-			return "==";
-			
-		}
-	}
+
 }

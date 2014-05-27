@@ -6,7 +6,7 @@ int testando2()
 {
 int pizza = 0;
 
-pizza = 33 + 32;
+pizza = 32 + 32;
 
 cout << (32 + 432+ 634 / 32 * 5423 - 24);
 string limao = "";

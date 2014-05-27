@@ -6,5 +6,7 @@ public class MathExpression extends Expression<Integer> {
 		super();
 		values.add(firstValue);
 	}
+	
+	
 
 }

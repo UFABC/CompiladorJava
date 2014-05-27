@@ -6,11 +6,11 @@ LITERAL_end="end"=6
 T_tipo=7
 T_pv=8
 T_atrib=9
-T_msg=10
-LITERAL_if="if"=11
-LITERAL_then="then"=12
-LITERAL_else="else"=13
-LITERAL_begin="begin"=14
+LITERAL_if="if"=10
+LITERAL_then="then"=11
+LITERAL_else="else"=12
+LITERAL_begin="begin"=13
+T_msg=14
 T_or=15
 T_and=16
 T_eq=17
