@@ -21,7 +21,7 @@ public class JujuParser extends antlr.LLkParser       implements JujuParserToken
 
 	private Program prog;
 	
-	private CommandIf comando;
+	private Variable<?> actualVar;
 
 	public String convertProgram()
 	{
@@ -32,7 +32,7 @@ public class JujuParser extends antlr.LLkParser       implements JujuParserToken
 		prog = new Program();
 	}
 
-	private void atrib(Variable<?> actualVar, int actualType, String actualValue) throws RecognitionException
+	private void atrib(int actualType, String actualValue) throws RecognitionException
 	{
 		if (actualVar == null) {
 			throw new RecognitionException("Variavel nao declarada, impossivel atribuir");
@@ -200,6 +200,11 @@ public JujuParser(ParserSharedInputState state) {
 				comandoIfElse();
 				break;
 			}
+			case LITERAL_while:
+			{
+				comandoWhile();
+				break;
+			}
 			case T_id:
 			{
 				atrib();
@@ -290,62 +295,96 @@ public JujuParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			match(LITERAL_if);
-			expr();
-			match(LITERAL_then);
-			{
-			int _cnt15=0;
-			_loop15:
-			do {
-				if ((_tokenSet_2.member(LA(1)))) {
-					comando();
-				}
-				else {
-					if ( _cnt15>=1 ) { break _loop15; } else {throw new NoViableAltException(LT(1), getFilename());}
-				}
-				
-				_cnt15++;
-			} while (true);
-			}
-			match(LITERAL_end);
-			{
-			switch ( LA(1)) {
-			case LITERAL_else:
-			{
-				match(LITERAL_else);
-				match(LITERAL_begin);
+			if ((LA(1)==LITERAL_if)) {
+				match(LITERAL_if);
+				exprif();
+				match(LITERAL_then);
 				{
-				int _cnt18=0;
-				_loop18:
+				int _cnt15=0;
+				_loop15:
 				do {
 					if ((_tokenSet_2.member(LA(1)))) {
 						comando();
 					}
 					else {
-						if ( _cnt18>=1 ) { break _loop18; } else {throw new NoViableAltException(LT(1), getFilename());}
+						if ( _cnt15>=1 ) { break _loop15; } else {throw new NoViableAltException(LT(1), getFilename());}
 					}
 					
-					_cnt18++;
+					_cnt15++;
 				} while (true);
 				}
 				match(LITERAL_end);
-				break;
+				match(LITERAL_else);
+				match(LITERAL_begin);
+				{
+				int _cnt17=0;
+				_loop17:
+				do {
+					if ((_tokenSet_2.member(LA(1)))) {
+						comando();
+					}
+					else {
+						if ( _cnt17>=1 ) { break _loop17; } else {throw new NoViableAltException(LT(1), getFilename());}
+					}
+					
+					_cnt17++;
+				} while (true);
+				}
+				match(LITERAL_end);
 			}
-			case T_id:
-			case LITERAL_end:
-			case T_tipo:
-			case LITERAL_if:
-			case LITERAL_input:
-			case LITERAL_output:
-			{
-				break;
+			else if ((LA(1)==LITERAL_if)) {
+				match(LITERAL_if);
+				exprif();
+				match(LITERAL_then);
+				{
+				int _cnt19=0;
+				_loop19:
+				do {
+					if ((_tokenSet_2.member(LA(1)))) {
+						comando();
+					}
+					else {
+						if ( _cnt19>=1 ) { break _loop19; } else {throw new NoViableAltException(LT(1), getFilename());}
+					}
+					
+					_cnt19++;
+				} while (true);
+				}
+				match(LITERAL_end);
 			}
-			default:
-			{
+			else {
 				throw new NoViableAltException(LT(1), getFilename());
 			}
+			
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_4);
+		}
+	}
+	
+	public final void comandoWhile() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			match(LITERAL_while);
+			exprwhile();
+			match(LITERAL_then);
+			{
+			int _cnt25=0;
+			_loop25:
+			do {
+				if ((_tokenSet_2.member(LA(1)))) {
+					comando();
+				}
+				else {
+					if ( _cnt25>=1 ) { break _loop25; } else {throw new NoViableAltException(LT(1), getFilename());}
+				}
+				
+				_cnt25++;
+			} while (true);
 			}
-			}
+			match(LITERAL_end);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -359,7 +398,7 @@ public JujuParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(T_id);
 			
-							Variable actualVar = prog.getVariable(LT(0).getText());
+							actualVar = prog.getVariable(LT(0).getText());
 						
 			match(T_atrib);
 			value();
@@ -408,7 +447,7 @@ public JujuParser(ParserSharedInputState state) {
 			{
 			match(T_num);
 			{
-			_loop27:
+			_loop35:
 			do {
 				if (((LA(1) >= T_plus && LA(1) <= T_div))) {
 					{
@@ -442,7 +481,7 @@ public JujuParser(ParserSharedInputState state) {
 					match(T_num);
 				}
 				else {
-					break _loop27;
+					break _loop35;
 				}
 				
 			} while (true);
@@ -455,7 +494,7 @@ public JujuParser(ParserSharedInputState state) {
 		}
 	}
 	
-	public final void expr() throws RecognitionException, TokenStreamException {
+	public final void exprif() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
@@ -463,33 +502,15 @@ public JujuParser(ParserSharedInputState state) {
 								CommandIf cmdif = new CommandIf();
 							
 			{
-			switch ( LA(1)) {
-			case T_id:
-			{
-				match(T_id);
-					
-									if(prog.existsVariable(LT(0).getText())) {
-										cmdif.setExprL(LT(0).getText());
-									}
-									else {
-										throw new RecognitionException("Voce nao criou essa variavel");
-									}
-								
-				break;
-			}
-			case T_msg:
-			{
-				match(T_msg);
+			match(T_id);
 				
-										cmdif.setExprL(LT(0).getText());
-									
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
+								if(prog.existsVariable(LT(0).getText())) {
+									cmdif.setExprL(LT(0).getText());
+								}
+								else {
+									throw new RecognitionException("Voce nao criou essa variavel");
+								}
+							
 			}
 			operator();
 			
@@ -509,9 +530,9 @@ public JujuParser(ParserSharedInputState state) {
 								
 				break;
 			}
-			case T_msg:
+			case T_num:
 			{
-				match(T_msg);
+				match(T_num);
 				cmdif.setExprR(LT(0).getText());
 				break;
 			}
@@ -576,6 +597,102 @@ public JujuParser(ParserSharedInputState state) {
 		}
 	}
 	
+	public final void exprwhile() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			if ((LA(1)==T_id)) {
+				
+									CommandWhile cmdwhile = new CommandWhile();
+								
+				{
+				match(T_id);
+					
+									if(prog.existsVariable(LT(0).getText())) {
+										cmdwhile.setExprL(LT(0).getText());
+									}
+									else {
+										throw new RecognitionException("Voce nao criou essa variavel");
+									}
+								
+				}
+				operator();
+				
+									cmdwhile.setOperator(LT(0).getType());
+								
+				{
+				switch ( LA(1)) {
+				case T_id:
+				{
+					match(T_id);
+						
+										if (prog.existsVariable(LT(0).getText())) {
+											cmdwhile.setExprR(LT(0).getText());
+										}
+										else 
+											throw new RecognitionException("Voce nao criou essa variavel");	
+									
+					break;
+				}
+				case T_msg:
+				{
+					match(T_msg);
+					cmdwhile.setExprR(LT(0).getText());
+					break;
+				}
+				default:
+				{
+					throw new NoViableAltException(LT(1), getFilename());
+				}
+				}
+				}
+			}
+			else if ((LA(1)==T_id||LA(1)==T_num)) {
+				{
+				switch ( LA(1)) {
+				case T_id:
+				{
+					match(T_id);
+						
+										if(prog.existsVariable(LT(0).getText())) {
+											cmdwhile.setExprL(LT(0).getText());
+										}
+										else if((LT(0).getText()).equals("true") || LT(0).getText().equals("false")){
+											cmdwhile.setExprL(LT(0).getText());
+										}
+										else {
+											throw new RecognitionException("Voce nao criou essa variavel");
+										}
+									
+					break;
+				}
+				case T_num:
+				{
+					match(T_num);
+					
+											cmdwhile.setExprL(LT(0).getText());
+										
+					break;
+				}
+				default:
+				{
+					throw new NoViableAltException(LT(1), getFilename());
+				}
+				}
+				}
+				prog.addCommand(cmdwhile);
+			}
+			else {
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_6);
+		}
+	}
+	
 	
 	public static final String[] _tokenNames = {
 		"<0>",
@@ -593,13 +710,14 @@ public JujuParser(ParserSharedInputState state) {
 		"\"then\"",
 		"\"else\"",
 		"\"begin\"",
+		"T_num",
+		"\"while\"",
 		"T_or",
 		"T_and",
 		"T_eq",
 		"T_neq",
 		"T_gt",
 		"T_lt",
-		"T_num",
 		"T_plus",
 		"T_minus",
 		"T_times",
@@ -620,12 +738,12 @@ public JujuParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 603982066L, 0L};
+		long[] data = { 1208027378L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	private static final long[] mk_tokenSet_2() {
-		long[] data = { 603981984L, 0L};
+		long[] data = { 1208027296L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
@@ -635,7 +753,7 @@ public JujuParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 603982048L, 0L};
+		long[] data = { 1208027360L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
@@ -650,7 +768,7 @@ public JujuParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 1056L, 0L};
+		long[] data = { 33824L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
