@@ -92,23 +92,25 @@ value		: T_msg | T_num
 
 comandoIfElse	: 	"if"{ComandoIf cmdif;}
  					(T_id
- 					{
- 						cmdif.setExprL(LT(0).getText());
- 					} | T_msg)
- 					{
-						cmdif.setExprL(LT(0).getText());
- 					}
+ 					{	if(st.exists(T_id){
+ 							cmdif.setExprL(LT(0).getText());
+ 							}
+ 						else 
+ 							throw new RecognitionException("Voce não criou essa variavel");	
+ 					} | T_msg {cmdif.setExprL(LT(0).getText());})		
+
  					operator
  					{
- 						cmdif.setExprR(LT(0).getType());
+ 						cmdif.setOperator(LT(0).getType());
  					}
  					(T_id
- 					{
- 						cmdif.setExprL(LT(0).getText());
- 					} | T_msg)
- 					{
-						cmdif.setExprL(LT(0).getText());
- 					}
+ 					{	if(st.exists(T_id){
+ 							cmdif.setExprR(LT(0).getText());
+ 							}
+ 						else 
+ 							throw new RecognitionException("Voce não criou essa variavel");	
+ 					} | T_msg {cmdif.setExprR(LT(0).getText());})	
+
  					"then"{st.add(cmdif);} 								
 					 (comando)+ 
 					 "end" 
