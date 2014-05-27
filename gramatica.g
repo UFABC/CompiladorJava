@@ -68,6 +68,7 @@ comando   	: cmdLeitura
 			| cmdEscrita
 			| declara
 			| comandoIfElse
+			| comandoWhile
 			| atrib
 			;
 	
@@ -101,54 +102,88 @@ atrib		: T_id
 value		: op_math  | op_text
 			;
 
-comandoIfElse	: 	"if" expr
- 					"then"						
-					 (comando)+ 
-					 "end" 
-					 (
-					 "else" 
-					 "begin" 
-					 (comando)+ 
-					 "end"
-					 )?
+comandoIfElse	: 	"if" exprif "then" (comando)+ "end" "else" "begin" (comando)+  "end" 
+				|	"if" exprif "then" (comando)+ "end"
 				;
 				
-expr		:	{
+exprif		:	{
 					CommandIf cmdif = new CommandIf();
 				}
 				(T_id
 				{	
 					if(prog.existsVariable(LT(0).getText())) {
-						//cmdif.setExprL(LT(0).getText());
-						System.out.println("teste");
+						cmdif.setExprL(LT(0).getText());
 					}
 					else {
 						throw new RecognitionException("Voce nao criou essa variavel");
 					}
-				} | T_msg
-					{
-						//cmdif.setExprL(LT(0).getText());
-						System.out.println("teste");
-					}
-				)		
+				} )		
 
 				operator
 				{
-					//cmdif.setOperator(LT(0).getType());
-					System.out.println("teste");
+					cmdif.setOperator(LT(0).getType());
 				}
 				(T_id
 				{	
 					if (prog.existsVariable(LT(0).getText())) {
-						//cmdif.setExprR(LT(0).getText());
-						System.out.println("teste");
+						cmdif.setExprR(LT(0).getText());
 					}
 					else 
 						throw new RecognitionException("Voce nao criou essa variavel");	
-				} | T_msg {//cmdif.setExprR(LT(0).getText());
-				System.out.println("teste");})
+				} | T_num {cmdif.setExprR(LT(0).getText());})
 				{prog.addCommand(cmdif);}	
  			;
+			
+comandoWhile	: "while" exprwhile "then" (comando)+ "end" 
+				;
+				
+exprwhile		:{
+					CommandWhile cmdwhile = new CommandWhile();
+				}
+				(T_id
+				{	
+					if(prog.existsVariable(LT(0).getText())) {
+						cmdwhile.setExprL(LT(0).getText());
+					}
+					else {
+						throw new RecognitionException("Voce nao criou essa variavel");
+					}
+				} )
+				operator
+				{
+					cmdwhile.setOperator(LT(0).getType());
+				}
+				(T_id
+				{	
+					if (prog.existsVariable(LT(0).getText())) {
+						cmdwhile.setExprR(LT(0).getText());
+					}
+					else 
+						throw new RecognitionException("Voce nao criou essa variavel");	
+				} 
+				| T_msg {cmdwhile.setExprR(LT(0).getText());})
+				
+				|(T_id
+				{	
+					if(prog.existsVariable(LT(0).getText())) {
+						cmdwhile.setExprL(LT(0).getText());
+					}
+					else if((LT(0).getText()).equals("true") || LT(0).getText().equals("false")){
+						cmdwhile.setExprL(LT(0).getText());
+					}
+					else {
+						throw new RecognitionException("Voce nao criou essa variavel");
+					}
+				} | T_num
+					{
+						cmdwhile.setExprL(LT(0).getText());
+					}
+				)		
+				
+				{prog.addCommand(cmdwhile);}
+				
+				;
+ 		
 
 operator  	: 	T_or
 			|
