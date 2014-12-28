@@ -116,12 +116,13 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
        try{
         JujuLexer  lexer = new JujuLexer(new FileInputStream(new File(strNomeArquivo)));
         JujuParser parser = new JujuParser(lexer);
         parser.init();
         parser.programStart();
+        jTextArea2.setText(parser.convertProgram());
+
        }
        catch(Exception e){
            jTextArea2.setText(e.getMessage());
@@ -129,7 +130,6 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
         try {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.showOpenDialog(this);

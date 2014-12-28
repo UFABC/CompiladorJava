@@ -135,7 +135,7 @@ value		: T_id
 				 		}
 					}
 				}
-				| op_math  | op_text
+				| op_math  | op_text | (T_ap value T_fp)
 			;
 
 comandoIfElse	: 	"if" exprif "then" (comando)+ "end" {prog.addCommand(new CommandEnd());}
@@ -246,7 +246,7 @@ cmdLeitura :  "input" T_ap T_id
 					}
 				;
 				
-cmdEscrita :  "output" T_ap 
+cmdEscrita 		:  "output" T_ap 
 									   value
 									   {
 									       prog.addCommand(new CommandWrite(actualExpression));
